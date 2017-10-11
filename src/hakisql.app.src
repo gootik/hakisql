@@ -1,0 +1,18 @@
+{application, hakisql,
+ [{description, "An OTP library"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [haki,
+    kernel,
+    stdlib,
+    runtime_tools
+   ]},
+  {env,[]},
+  {modules, []},
+  {mod, {hakisql_app, []}},
+
+  {maintainers, []},
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.

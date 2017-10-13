@@ -7,20 +7,32 @@
     q/2
 ]).
 
+-define(INDEX_TABLE_POSTFIX, "_i").
+-define(SCHEMA_TABLE_POSTFIX, "_schema").
+
 create(TableName, Schema) ->
     TableNameList = atom_to_list(TableName),
-    SchemaTableName = list_to_atom(TableNameList ++ "_schema"),
-    IndexTable = list_to_atom(TableNameList ++ "_i"),
+    SchemaTableName = list_to_atom(TableNameList ++ ?SCHEMA_TABLE_POSTFIX),
+    IndexTable = list_to_atom(TableNameList ++ ?INDEX_TABLE_POSTFIX),
+
+    IndexFieldNames = lists:filtermap(
+        fun({Field, SchemaDef}) ->
+            case lists:member(index, SchemaDef) of
+                true -> {true, Field};
+                false -> false
+            end
+        end, maps:to_list(Schema)),
 
     InternalSchema = #{cols => Schema,
                        num_rows => 0,
                        table_name => TableName,
-                       index_table => IndexTable},
+                       index_table => IndexTable,
+                       index_field_names => IndexFieldNames},
 
     haki:cache(SchemaTableName, InternalSchema).
 
 insert(TableName, Rows) ->
-    SchemaTableName = list_to_atom(atom_to_list(TableName) ++ "_schema"),
+    SchemaTableName = list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX),
     Schema = case haki:get(SchemaTableName) of
                  bad_key -> error(no_table);
                  S -> S
@@ -41,7 +53,7 @@ insert(TableName, Rows) ->
 
 q(TableName, Query) ->
     try
-        SchemaTableName = list_to_atom(atom_to_list(TableName) ++ "_schema"),
+        SchemaTableName = list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX),
         Schema = case haki:get(SchemaTableName) of
                      bad_key -> error(no_table);
                      S -> S
@@ -92,24 +104,16 @@ get_using_bitmap(Table, Bitmap) ->
          haki:get(Table, RowKey)
      end || Row <- Rows].
 
-calculate_index_map(Schema, Rows, NumRows) ->
-    IndexFields = lists:filtermap(
-        fun({Field, SchemaDef}) ->
-            case lists:member(index, SchemaDef) of
-                true -> {true, Field};
-                false -> false
-            end
-        end, maps:to_list(maps:get(cols, Schema))),
-
+calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, NumRows) ->
     InitMap = lists:foldl(
         fun(Field, Acc) ->
             Acc#{Field => #{}}
-        end, #{}, IndexFields),
+        end, #{}, IndexFieldNames),
 
     %% @TODO: Use bitmap:set_many() to set all bits at once instead of looping
     lists:foldl(
         fun(#{'_id' := Id} = Row, IndexMap) ->
-            Values = [{Field, maps:get(Field, Row)} || Field <- IndexFields],
+            IndexFieldValues = index_values(Row, IndexFieldNames),
             lists:foldl(
                 fun({Field, Value}, Acc) ->
                     FM = maps:get(Field, Acc),
@@ -124,5 +128,8 @@ calculate_index_map(Schema, Rows, NumRows) ->
                           end,
 
                     Acc#{Field => NFM}
-                end, IndexMap, Values)
+                end, IndexMap, IndexFieldValues)
         end, InitMap, Rows).
+
+index_values(Row, IndexFieldNames) ->
+    [{Field, maps:get(Field, Row)} || Field <- IndexFieldNames].

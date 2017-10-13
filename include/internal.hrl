@@ -1,0 +1,2 @@
+-define(INDEX_TABLE_POSTFIX, "_i").
+-define(SCHEMA_TABLE_POSTFIX, "_schema").

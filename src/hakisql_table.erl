@@ -1,5 +1,7 @@
 -module(hakisql_table).
 
+-include("internal.hrl").
+
 -export([
     create/2,
     insert/2,
@@ -7,9 +9,6 @@
     schema_for_table/1,
     internal_table_name/2
 ]).
-
--define(INDEX_TABLE_POSTFIX, "_i").
--define(SCHEMA_TABLE_POSTFIX, "_schema").
 
 -spec create(atom(), map()) -> ok.
 create(TableName, Schema) ->

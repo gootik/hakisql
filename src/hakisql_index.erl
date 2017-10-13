@@ -55,10 +55,18 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
     %% TODO: Use bitmap:set_many() to set all bits at once instead of looping
     lists:foldl(
         fun(#{'_id' := Id} = Row, IndexMap) ->
+
+            %% All the values that need to be added to bitmaps from this row
             IndexFieldValues = index_values(Row, IndexFieldNames),
+
+            %% For every {Field, Value} pair find it in the final map and update
+            %% the bitmap.
             lists:foldl(
                 fun({Field, Value}, Acc) ->
                     FM = maps:get(Field, Acc),
+
+                    %% If the value has not been seen yet, then create a new bitmap with
+                    %% the specific bit set. If it exists, get it and update it.
                     NFM = case maps:is_key(Value, FM) of
                               true ->
                                   {ok, NewIndex} = bitmap:set(Id, maps:get(Value, FM)),
@@ -69,6 +77,7 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
                                   FM#{Value => NewIndex}
                           end,
 
+                    %% Update the final map with the newly updated bitmap for the field.
                     Acc#{Field => NFM}
                 end, IndexMap, IndexFieldValues)
         end, InitMap, Rows).

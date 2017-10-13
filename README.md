@@ -27,30 +27,30 @@ Does not exist. Restart the VM and your data is gone :)
 
 ### Example 
 ```erlang
-    Erlang/OTP 20 [erts-9.1] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:0] [hipe] [kernel-poll:false]
-    
-    Eshell V9.1  (abort with ^G)
-    1>  hakisql:create(test, #{
-    1>      a => [index, atom],
-    1>      b => [index, number],
-    1>      c => [number],
-    1>      name => [string]
-    1>  }).
-    ok
-    
-    2> hakisql:insert(test, [
-    2>     #{a => test, b => 2, c => 3.1, name => "A"},
-    2>     #{a => test2, b => 24, c => 12.1, name => "B"},
-    2>     #{a => test, b => 4, c => 12.1, name => "C"},
-    2>     #{a => test2, b => 24, c => 12.1, name => "D"},
-    2>     #{a => test, b => 8, c => 12.1, name => "E"},
-    2>     #{a => test4, b => 24, c => 12.1, name => "F"}
-    2> ]).
-    ok
+Erlang/OTP 20 [erts-9.1] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:0] [hipe] [kernel-poll:false]
 
-    3> hakisql:q(test, "(b = 2 OR b = 8) AND a = test").
-    [#{a => test,b => 2,c => 3.1,name => "A"},
-     #{a => test,b => 8,c => 12.1,name => "E"}]
+Eshell V9.1  (abort with ^G)
+1>  hakisql:create(test, #{
+1>      a => [index, atom],
+1>      b => [index, number],
+1>      c => [number],
+1>      name => [string]
+1>  }).
+ok
+
+2> hakisql:insert(test, [
+2>     #{a => test, b => 2, c => 3.1, name => "A"},
+2>     #{a => test2, b => 24, c => 12.1, name => "B"},
+2>     #{a => test, b => 4, c => 12.1, name => "C"},
+2>     #{a => test2, b => 24, c => 12.1, name => "D"},
+2>     #{a => test, b => 8, c => 12.1, name => "E"},
+2>     #{a => test4, b => 24, c => 12.1, name => "F"}
+2> ]).
+ok
+
+3> hakisql:q(test, "(b = 2 OR b = 8) AND a = test").
+[#{a => test,b => 2,c => 3.1,name => "A"},
+ #{a => test,b => 8,c => 12.1,name => "E"}]
     
 ```
 

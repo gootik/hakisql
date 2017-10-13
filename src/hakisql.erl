@@ -29,7 +29,6 @@ q(TableName, Query) ->
         {ok, Result}
     catch
         error:Reason ->
-            io:format("~p~n", [erlang:get_stacktrace()]),
             {error, Reason, []}
     end.
 
@@ -66,7 +65,8 @@ query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'o
         FieldMap -> maps:get(Value, FieldMap, EmptyField)
     end,
 
-    invert_bitmap(Bitmap);
+    {ok, Invert} = bitmap:invert(Bitmap),
+    Invert;
 
 query_to_bitmap(_, {'op', _, _, _}) ->
     error(not_implemented).
@@ -78,7 +78,3 @@ fetch_using_bitmap(Table, Bitmap) ->
          RowKey = list_to_atom(integer_to_list(Row)),
          haki:get(Table, RowKey)
      end || Row <- Rows].
-
-
-invert_bitmap(<<Size:64/unsigned, L:Size/unsigned, P/bitstring>>) ->
-    <<Size:64/unsigned, (bnot L):Size/unsigned, P/bitstring>>.

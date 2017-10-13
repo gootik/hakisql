@@ -21,6 +21,26 @@ simple_test() ->
 
     {ok, [#{a := test, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "b = 2").
 
+simple_not_test() ->
+    ok = hakisql:create(test_not, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [number],
+        name => [string]
+    }),
+
+    ok = hakisql:insert(test_not, [
+        #{a => test, b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 24, c => 12.1, name => "B"},
+        #{a => test, b => 24, c => 12.1, name => "C"},
+        #{a => test2, b => 24, c => 12.1, name => "D"},
+        #{a => test, b => 24, c => 12.1, name => "E"},
+        #{a => test4, b => 24, c => 12.1, name => "F"}
+    ]),
+
+    {ok, [#{a := test, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test_not, "b != 24").
+
+
 range_test() ->
     hakisql:create(range_test, #{
         b => [index]

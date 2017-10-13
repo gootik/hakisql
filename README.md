@@ -23,6 +23,8 @@ Does not exist. Restart the VM and your data is gone :)
 2. Array values
 3. Range query use range bitmap index
 4. Cleanup code
+5. String comparisons
+6. More operators
 
 
 ### Example 

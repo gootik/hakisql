@@ -7,53 +7,16 @@
     q/2
 ]).
 
--define(INDEX_TABLE_POSTFIX, "_i").
--define(SCHEMA_TABLE_POSTFIX, "_schema").
 
 create(TableName, Schema) ->
-    TableNameList = atom_to_list(TableName),
-    SchemaTableName = list_to_atom(TableNameList ++ ?SCHEMA_TABLE_POSTFIX),
-    IndexTable = list_to_atom(TableNameList ++ ?INDEX_TABLE_POSTFIX),
-
-    IndexFieldNames = lists:filtermap(
-        fun({Field, SchemaDef}) ->
-            case lists:member(index, SchemaDef) of
-                true -> {true, Field};
-                false -> false
-            end
-        end, maps:to_list(Schema)),
-
-    InternalSchema = #{cols => Schema,
-                       num_rows => 0,
-                       table_name => TableName,
-                       index_table => IndexTable,
-                       index_field_names => IndexFieldNames},
-
-    haki:cache(SchemaTableName, InternalSchema).
+    hakisql_table:create(TableName, Schema).
 
 insert(TableName, Rows) ->
-    SchemaTableName = list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX),
-    Schema = case haki:get(SchemaTableName) of
-                 bad_key -> error(no_table);
-                 S -> S
-             end,
-
-    {EnrichedRows, {RowMap, NumRows}} = lists:mapfoldl(
-        fun(RowMap, {AccMap, RowId}) ->
-            RowKey = list_to_atom(integer_to_list(RowId)),
-            {RowMap#{'_id' => RowId}, {AccMap#{RowKey => RowMap}, RowId + 1}}
-        end, {#{}, maps:get(num_rows, Schema)}, Rows),
-
-    haki:cache(SchemaTableName, Schema#{num_rows => NumRows}),
-    haki:cache_bucket(TableName, RowMap, #{compiler => haki_beam_compiler}),
-
-    IndexMap = calculate_index_map(Schema, EnrichedRows, NumRows),
-
-    haki:cache_bucket(maps:get(index_table, Schema), IndexMap).
+    hakisql_table:insert(TableName, Rows).
 
 q(TableName, Query) ->
     try
-        SchemaTableName = list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX),
+        SchemaTableName = list_to_atom(atom_to_list(TableName) ++ "_schema"),
         Schema = case haki:get(SchemaTableName) of
                      bad_key -> error(no_table);
                      S -> S
@@ -103,33 +66,3 @@ get_using_bitmap(Table, Bitmap) ->
          RowKey = list_to_atom(integer_to_list(Row)),
          haki:get(Table, RowKey)
      end || Row <- Rows].
-
-calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, NumRows) ->
-    InitMap = lists:foldl(
-        fun(Field, Acc) ->
-            Acc#{Field => #{}}
-        end, #{}, IndexFieldNames),
-
-    %% @TODO: Use bitmap:set_many() to set all bits at once instead of looping
-    lists:foldl(
-        fun(#{'_id' := Id} = Row, IndexMap) ->
-            IndexFieldValues = index_values(Row, IndexFieldNames),
-            lists:foldl(
-                fun({Field, Value}, Acc) ->
-                    FM = maps:get(Field, Acc),
-                    NFM = case maps:is_key(Value, FM) of
-                              true ->
-                                  {ok, NewIndex} = bitmap:set(Id, maps:get(Value, FM)),
-                                  FM#{Value => NewIndex};
-                              false ->
-                                  {ok, NewIndex0} = bitmap:new([{size, NumRows}]),
-                                  {ok, NewIndex} = bitmap:set(Id, NewIndex0),
-                                  FM#{Value => NewIndex}
-                          end,
-
-                    Acc#{Field => NFM}
-                end, IndexMap, IndexFieldValues)
-        end, InitMap, Rows).
-
-index_values(Row, IndexFieldNames) ->
-    [{Field, maps:get(Field, Row)} || Field <- IndexFieldNames].

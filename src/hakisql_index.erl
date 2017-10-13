@@ -13,21 +13,21 @@
 %%      Which means we need to have separate bitmap maps for every value
 %%      of 'a' and 'b'.
 %%
-%%      Here we first create a map of every indexed field, that contains
-%%      all possible value bitmaps. Hence we get:
+%%      Here we first create a map of every indexed field, that will contain
+%%      all possible values' bitmaps. Hence we get:
 %%
 %%      InitMap = #{
 %%          a => #{},
 %%          b => #{}
 %%      }
 %%
-%%      Next, we loop through every row and adding/updating the bitmaps for
+%%      Next, we loop through every row and add/update the bitmaps for
 %%      every entry of the indexed fields. Given below example as inserted
 %%      rows:
 %%
-%%      [#{a => test, b = 2, c => not_important},
-%%       #{a => test2, b = 2, c => not_important},
-%%       #{a => test, b = 3, c => not_important}]
+%%      [#{a => test, b = 2, c => not_important, _id => 0},
+%%       #{a => test2, b = 2, c => not_important, _id => 1},
+%%       #{a => test, b = 3, c => not_important, _id => 2}]
 %%
 %%      We _should_ have a final map that looks like:
 %%

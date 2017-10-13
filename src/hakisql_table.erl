@@ -11,6 +11,7 @@
 -define(INDEX_TABLE_POSTFIX, "_i").
 -define(SCHEMA_TABLE_POSTFIX, "_schema").
 
+-spec create(atom(), map()) -> ok.
 create(TableName, Schema) ->
     SchemaTableName = internal_table_name(schema, TableName),
     IndexTableName = internal_table_name(index, TableName),
@@ -24,6 +25,7 @@ create(TableName, Schema) ->
 
     haki:cache(SchemaTableName, InternalSchema).
 
+-spec insert(atom(), [map()]) -> ok.
 insert(TableName, Rows) ->
     Schema = schema_for_table(TableName),
 
@@ -40,12 +42,14 @@ insert(TableName, Rows) ->
 
     haki:cache_bucket(maps:get(index_table, Schema), IndexMap).
 
+-spec schema_for_table(atom()) -> map() | error.
 schema_for_table(TableName) ->
     case haki:get(internal_table_name(schema, TableName)) of
         bad_key -> error(no_table);
         Schema -> Schema
     end.
 
+-spec internal_table_name(schema | index, atom()) -> atom().
 internal_table_name(schema, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX);
 internal_table_name(index, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?INDEX_TABLE_POSTFIX).
 

@@ -36,9 +36,9 @@ range_test() ->
         #{a => test, b => 400, c => 3.1, name => "A"}
     ]),
 
-    {ok, R1} = hakisql:q(test, "b <= 400"),
-    {ok, R2} = hakisql:q(test, "b <= 2"),
-    {ok, R3} = hakisql:q(test, "b >= 400"),
-    {ok, R4} = hakisql:q(test, "b >= 2"),
+    {ok, _R1} = hakisql:q(test, "b <= 400"),
+    {ok, _R2} = hakisql:q(test, "b <= 2"),
+    {ok, _R3} = hakisql:q(test, "b >= 400"),
+    {ok, _R4} = hakisql:q(test, "b >= 2"),
 
-    {ok, R5} = hakisql:q(test, "b <= 6 AND b >= 3").
+    {ok, _R5} = hakisql:q(test, "b <= 6 AND b >= 3").

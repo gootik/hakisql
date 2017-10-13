@@ -54,5 +54,9 @@ Does not exist. Restart the VM and your data is gone :)
     
 ```
 
+### References
+The Lexer and Parser code was shamefully copied/modified from [swirl][2].
+
 
 [1]: https://github.com/gootik/hakicache
+[2]: https://github.com/lpgauth/swirl

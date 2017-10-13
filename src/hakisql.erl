@@ -16,12 +16,7 @@ insert(TableName, Rows) ->
 
 q(TableName, Query) ->
     try
-        SchemaTableName = list_to_atom(atom_to_list(TableName) ++ "_schema"),
-        Schema = case haki:get(SchemaTableName) of
-                     bad_key -> error(no_table);
-                     S -> S
-                 end,
-
+        Schema = hakisql_table:schema_for_table(TableName),
         {ok, AQT} = parse_query(Query),
         Bitmap = query_to_bitmap(Schema, AQT),
         Result = get_using_bitmap(TableName, Bitmap),

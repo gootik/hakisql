@@ -25,11 +25,7 @@ create(TableName, Schema) ->
     haki:cache(SchemaTableName, InternalSchema).
 
 insert(TableName, Rows) ->
-    SchemaTableName = list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX),
-    Schema = case haki:get(SchemaTableName) of
-                 bad_key -> error(no_table);
-                 S -> S
-             end,
+    Schema = schema_for_table(TableName),
 
     {EnrichedRows, {RowMap, NumRows}} = lists:mapfoldl(
         fun(RowMap, {AccMap, RowId}) ->
@@ -37,7 +33,7 @@ insert(TableName, Rows) ->
             {RowMap#{'_id' => RowId}, {AccMap#{RowKey => RowMap}, RowId + 1}}
         end, {#{}, maps:get(num_rows, Schema)}, Rows),
 
-    haki:cache(SchemaTableName, Schema#{num_rows => NumRows}),
+    haki:cache(internal_table_name(schema, TableName), Schema#{num_rows => NumRows}),
     haki:cache_bucket(TableName, RowMap, #{compiler => haki_beam_compiler}),
 
     IndexMap = hakisql_index:calculate_index_map(Schema, EnrichedRows, NumRows),

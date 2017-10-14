@@ -49,7 +49,7 @@ simple_contains_not_test() ->
     }),
 
     ok = hakisql:insert(test_not, [
-        #{a => [test, test4], b => 2, c => 3.1, name => "A"},
+        #{a => [test, test5], b => 2, c => 3.1, name => "A"},
         #{a => test2, b => 24, c => 12.1, name => "B"},
         #{a => test, b => 24, c => 12.1, name => "C"},
         #{a => test2, b => 24, c => 12.1, name => "D"},
@@ -57,7 +57,7 @@ simple_contains_not_test() ->
         #{a => test4, b => 24, c => 12.1, name => "F"}
     ]),
 
-    {ok, [#{a := [test, test4], b := 2, c := 3.1, name := "A"}]} = hakisql:q(test_not, "a has test4").
+    {ok, [#{a := [test, test5], b := 2, c := 3.1, name := "A"}]} = hakisql:q(test_not, "a has test5").
 
 
 

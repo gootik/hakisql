@@ -52,7 +52,7 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
             Acc#{Field => #{}}
         end, #{}, IndexFieldNames),
 
-    %% TODO: Use bitmap:set_many() to set all bits at once instead of looping
+    %% TODO: Use bitmap:from_list() to set all bits at once instead of looping
     lists:foldl(
         fun(#{'_id' := RowId} = Row, IndexMap) ->
 
@@ -64,7 +64,6 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
             lists:foldl(
                 fun({Field, Value}, Acc) ->
                     FieldMap = maps:get(Field, Acc),
-
                     Values = case is_list(Value) of
                                  true -> case io_lib:printable_list(Value) of
                                              true -> [Value];

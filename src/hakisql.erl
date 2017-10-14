@@ -57,6 +57,14 @@ query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'o
         FieldMap -> maps:get(Value, FieldMap, EmptyField)
     end;
 
+query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'has', Field, Value}) ->
+    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
+
+    case haki:get(IndexTable, Field) of
+        bad_key -> EmptyField;
+        FieldMap -> maps:get(Value, FieldMap, EmptyField)
+    end;
+
 query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', '!=', Field, Value}) ->
     {ok, EmptyField} = bitmap:new([{size, NumRows}]),
 

@@ -54,7 +54,7 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
 
     %% TODO: Use bitmap:set_many() to set all bits at once instead of looping
     lists:foldl(
-        fun(#{'_id' := Id} = Row, IndexMap) ->
+        fun(#{'_id' := RowId} = Row, IndexMap) ->
 
             %% All the values that need to be added to bitmaps from this row
             IndexFieldValues = index_values(Row, IndexFieldNames),
@@ -63,24 +63,40 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
             %% the bitmap.
             lists:foldl(
                 fun({Field, Value}, Acc) ->
-                    FM = maps:get(Field, Acc),
+                    FieldMap = maps:get(Field, Acc),
 
-                    %% If the value has not been seen yet, then create a new bitmap with
-                    %% the specific bit set. If it exists, get it and update it.
-                    NFM = case maps:is_key(Value, FM) of
-                              true ->
-                                  {ok, NewIndex} = bitmap:set(Id, maps:get(Value, FM)),
-                                  FM#{Value => NewIndex};
-                              false ->
-                                  {ok, NewIndex0} = bitmap:new([{size, NumRows}]),
-                                  {ok, NewIndex} = bitmap:set(Id, NewIndex0),
-                                  FM#{Value => NewIndex}
-                          end,
+                    Values = case is_list(Value) of
+                                 true -> case io_lib:printable_list(Value) of
+                                             true -> [Value];
+                                             false -> Value
+                                         end;
+                                 false ->
+                                     [Value]
+                             end,
+
+                    NewFieldMap = calculate_field_map(FieldMap, Values, NumRows, RowId),
 
                     %% Update the final map with the newly updated bitmap for the field.
-                    Acc#{Field => NFM}
+                    Acc#{Field => NewFieldMap}
                 end, IndexMap, IndexFieldValues)
         end, InitMap, Rows).
 
 index_values(Row, IndexFieldNames) ->
     [{Field, maps:get(Field, Row)} || Field <- IndexFieldNames].
+
+
+calculate_field_map(FieldMap, [], _, _) ->
+    FieldMap;
+calculate_field_map(FieldMap, [Value | Rest], NumRows, RowId) ->
+%% If the value has not been seen yet, then create a new bitmap with
+%% the specific bit set. If it exists, get it and update it.
+    NFM = case maps:is_key(Value, FieldMap) of
+              true ->
+                  {ok, NewIndex} = bitmap:set(RowId, maps:get(Value, FieldMap)),
+                  FieldMap#{Value => NewIndex};
+              false ->
+                  {ok, NewIndex0} = bitmap:new([{size, NumRows}]),
+                  {ok, NewIndex} = bitmap:set(RowId, NewIndex0),
+                  FieldMap#{Value => NewIndex}
+          end,
+    calculate_field_map(NFM, Rest, NumRows, RowId).

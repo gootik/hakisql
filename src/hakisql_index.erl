@@ -65,6 +65,7 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
                 fun({Field, Value}, Acc) ->
                     FieldMap = maps:get(Field, Acc),
                     Values = case is_list(Value) of
+                                 %% TODO: LOL this is dumb.
                                  true -> case io_lib:printable_list(Value) of
                                              true -> [Value];
                                              false -> Value

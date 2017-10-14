@@ -25,7 +25,7 @@
 %%      every entry of the indexed fields. Given below example as inserted
 %%      rows:
 %%
-%%      [#{a => test, b = 2, c => not_important, _id => 0},
+%%      [#{a => [test, test3], b = 2, c => not_important, _id => 0},
 %%       #{a => test2, b = 2, c => not_important, _id => 1},
 %%       #{a => test, b = 3, c => not_important, _id => 2}]
 %%
@@ -34,7 +34,8 @@
 %%      FinalMap = #{
 %%          a => #{
 %%              test  => 101,
-%%              test2 => 010
+%%              test2 => 010,
+%%              test3 => 100
 %%          },
 %%          b => #{
 %%              2 => 110,
@@ -44,6 +45,10 @@
 %%
 %%      We then cache this map for every field and use the bitmaps at query
 %%      time to figure out which rows need to be fetched.
+%%
+%%      For fields with multiple values, we add the row into all bitmaps. This
+%%      will let us to be able to run queries like `a has test3`. Which actually
+%%      would translate into `a = test3` for the bitmap translation.
 %% @end
 calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, NumRows) ->
 

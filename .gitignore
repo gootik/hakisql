@@ -18,5 +18,5 @@ rebar3.crashdump
 *.iml
 *.lock
 
-src/hakisql_parser.erl
-src/hakisql_lexer.erl
+src/query/hakisql_parser.erl
+src/query/hakisql_lexer.erl

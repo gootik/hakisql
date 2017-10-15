@@ -53,7 +53,6 @@ ok
 3> hakisql:q(test, "(b = 2 OR b = 8) AND a = test").
 [#{a => test,b => 2,c => 3.1,name => "A"},
  #{a => test,b => 8,c => 12.1,name => "E"}]
-    
 ```
 
 ### References

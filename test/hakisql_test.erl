@@ -4,10 +4,10 @@
 
 simple_test() ->
     ok = hakisql:create(test, #{
-            a => [index, atom],
-            b => [index, number],
-            c => [number],
-            name => [string]
+        a => [index, atom],
+        b => [index, number],
+        c => [number],
+        name => [string]
     }),
 
     ok = hakisql:insert(test, [
@@ -82,3 +82,9 @@ range_test() ->
     {ok, _R4} = hakisql:q(test, "b >= 2"),
 
     {ok, _R5} = hakisql:q(test, "b <= 6 AND b >= 3").
+
+to_range_encoded_bitmap_test() ->
+    {ok, Bitmap} = bitmap:new([{size, 8}]),
+    {ok, Bitmap1} = bitmap:set(3, Bitmap),
+
+    ?assertEqual(<<0, 0, 0, 0, 0, 0, 0, 8, 31>>, hakisql_index:to_range_encoded_bitmap(Bitmap1)).

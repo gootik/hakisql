@@ -1,7 +1,8 @@
 -module(hakisql_index).
 
 -export([
-    calculate_index_map/3
+    calculate_index_map/3,
+    to_range_encoded_bitmap/1
 ]).
 
 %% @doc To demonstrate the index calculation we can use this example:
@@ -89,8 +90,12 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
 index_values(Row, IndexFieldNames) ->
     [{Field, maps:get(Field, Row)} || Field <- IndexFieldNames].
 
-
+%% Turns it into a range-encoded bitmap
 calculate_field_map(FieldMap, [], _, _) ->
+    maps:fold(fun(K, V, AccMap) ->
+                    AccMap#{K => to_range_encoded_bitmap(V)}
+              end, #{}, FieldMap),
+
     FieldMap;
 calculate_field_map(FieldMap, [Value | Rest], NumRows, RowId) ->
 %% If the value has not been seen yet, then create a new bitmap with
@@ -105,3 +110,14 @@ calculate_field_map(FieldMap, [Value | Rest], NumRows, RowId) ->
                   FieldMap#{Value => NewIndex}
           end,
     calculate_field_map(NFM, Rest, NumRows, RowId).
+
+to_range_encoded_bitmap(Bitmap) ->
+    case bitmap:to_list(Bitmap) of
+        [] ->
+            Bitmap;
+        SetBits ->
+            FirstSetBit = hd(SetBits),
+            LastIndex = bitmap:size(Bitmap) - 1,
+            {ok, NewBitmap} = bitmap:set_many(lists:seq(FirstSetBit, LastIndex), Bitmap),
+            NewBitmap
+    end.

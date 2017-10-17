@@ -94,9 +94,7 @@ index_values(Row, IndexFieldNames) ->
 calculate_field_map(FieldMap, [], _, _) ->
     maps:fold(fun(K, V, AccMap) ->
                     AccMap#{K => to_range_encoded_bitmap(V)}
-              end, #{}, FieldMap),
-
-    FieldMap;
+              end, #{}, FieldMap);
 calculate_field_map(FieldMap, [Value | Rest], NumRows, RowId) ->
 %% If the value has not been seen yet, then create a new bitmap with
 %% the specific bit set. If it exists, get it and update it.

@@ -64,11 +64,10 @@ schema_for_table(TableName) ->
 fetch_using_bitmap(TableName, Bitmap) ->
     Rows = bitmap:to_list(Bitmap),
 
-    lists:map(
-        fun(Row) ->
-            RowKey = list_to_atom(integer_to_list(Row)),
-            haki:get(TableName, RowKey)
-        end, Rows).
+    [begin
+         RowKey = list_to_atom(integer_to_list(Row)),
+         haki:get(TableName, RowKey)
+     end || Row <- Rows].
 
 internal_table_name(schema, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX);
 internal_table_name(index, TableName)  -> list_to_atom(atom_to_list(TableName) ++ ?INDEX_TABLE_POSTFIX).

@@ -26,7 +26,7 @@ Does not exist. Restart the VM and your data is gone :)
 5. ~~String comparisons~~
 6. More operators
    - Range queries
-   - NOT IN
+   - ~~NOT IN~~
    - 
 7. Custom filtering funs?! like ets:fun2ms()
 

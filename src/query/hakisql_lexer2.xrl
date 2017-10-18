@@ -11,6 +11,7 @@ in         : {token, {'in', TokenLine, atom(TokenChars)}}.
 has        : {token, {'has', TokenLine, atom(TokenChars)}}.
 or         : {token, {'or', TokenLine, atom(TokenChars)}}.
 and        : {token, {'and', TokenLine, atom(TokenChars)}}.
+not        : {token, {'not', TokenLine, atom(TokenChars)}}.
 
 {OPERATOR} : {token, {op, TokenLine, atom(TokenChars)}}.
 

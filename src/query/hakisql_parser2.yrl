@@ -13,6 +13,7 @@ Terminals
     integer
     string
     float
+    'not'
     'in'
     'or'
     'and'
@@ -28,6 +29,8 @@ predicates -> predicates 'or' predicate : {'or', '$1', '$3'}.
 predicates -> predicate 'and' predicate : {'and', '$1', '$3'}.
 
 predicate -> var 'in' list : {'op', 'in', unwrap('$1'), '$3'}.
+predicate -> var 'not' 'in' list : {'op', 'notin', unwrap('$1'), '$4'}.
+
 predicate -> var 'has' element : {'op', 'has', unwrap('$1'), '$3'}.
 
 predicate -> var 'op' element : {'op', unwrap('$2'), unwrap('$1'), '$3'}.

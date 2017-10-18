@@ -19,6 +19,7 @@ and        : {token, {'and', TokenLine, atom(TokenChars)}}.
 {L}+       : {token, {var, TokenLine, atom(TokenChars)}}.
 
 {D}+       : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
+{D}+\.{D}+ : {token, {float, TokenLine, list_to_integer(TokenChars)}}.
 
 [(),]      : {token, {atom(TokenChars), TokenLine}}.
 

@@ -83,6 +83,30 @@ simple_in_test() ->
 
     ExpectedResult = Result.
 
+simple_not_in_test() ->
+    ok = hakisql:create(test_in, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [number],
+        name => [string]
+    }),
+
+    ok = hakisql:insert(test_in, [
+        #{a => [test, test5], b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 24, c => 12.1, name => "B"},
+        #{a => test, b => 24, c => 12.1, name => "C"},
+        #{a => test2, b => 24, c => 12.1, name => "D"},
+        #{a => test, b => 24, c => 12.1, name => "E"},
+        #{a => test4, b => 24, c => 12.1, name => "F"}
+    ]),
+
+    ExpectedResult = [#{a => test, b => 24, c => 12.1, name => "C"},
+                      #{a => test, b => 24, c => 12.1, name => "E"}],
+
+    {ok, Result} = hakisql:q(test_in, "a not in (test5, test2, test4, not_exiting)"),
+
+    ExpectedResult = Result.
+
 simple_string_test() ->
     ok = hakisql:create(test_string, #{
         a => [index, atom],

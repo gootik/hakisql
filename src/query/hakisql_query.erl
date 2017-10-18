@@ -18,11 +18,8 @@ rows_for_query(TableName, Query) ->
     end.
 
 parse_query(Query) ->
-    {ok, Lex, _} = hakisql_lexer:string(Query),
-    io:format(user, "Lex: ~p~n", [Lex]),
-    {ok, A} = hakisql_parser:parse(Lex),
-    io:format(user, "A: ~p~n", [A]),
-    {ok, A}.
+    {ok, Lex, _} = hakisql_lexer2:string(Query),
+    hakisql_parser2:parse(Lex).
 
 query_to_bitmap(Schema, {'or', Lterm, Rterm}) ->
     bitmap:union(
@@ -47,19 +44,22 @@ query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'o
 query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'has', Field, Value}) ->
     {ok, EmptyField} = bitmap:new([{size, NumRows}]),
 
-    case haki:get(IndexTable, Field) of
-        bad_key -> EmptyField;
-        FieldMap -> maps:get(Value, FieldMap, EmptyField)
-    end;
+    field_value_bitmap(IndexTable, Field, Value, EmptyField);
+
+query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'in', Field, {list, Values}}) ->
+    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
+
+    lists:foldl(
+        fun(Value, Acc) ->
+            bitmap:union(
+                Acc,
+                field_value_bitmap(IndexTable, Field, Value, EmptyField))
+        end, EmptyField, Values);
 
 query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', '!=', Field, Value}) ->
     {ok, EmptyField} = bitmap:new([{size, NumRows}]),
 
-    Bitmap = case haki:get(IndexTable, Field) of
-                 bad_key -> EmptyField;
-                 FieldMap -> maps:get(Value, FieldMap, EmptyField)
-             end,
-
+    Bitmap = field_value_bitmap(IndexTable, Field, Value, EmptyField),
     bitmap:invert(Bitmap);
 
 query_to_bitmap(_, {'op', _, _, _}) ->
@@ -73,3 +73,9 @@ fetch_using_bitmap(Table, Bitmap) ->
          haki:get(Table, RowKey)
      end || Row <- Rows].
 
+
+field_value_bitmap(IndexTable, Field, Value, Default) ->
+    case haki:get(IndexTable, Field) of
+        bad_key -> Default;
+        FieldMap -> maps:get(Value, FieldMap, Default)
+    end.

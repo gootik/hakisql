@@ -4,10 +4,10 @@
 
 simple_test() ->
     ok = hakisql:create(test, #{
-            a => [index, atom],
-            b => [index, number],
-            c => [number],
-            name => [string]
+        a => [index, atom],
+        b => [index, number],
+        c => [number],
+        name => [string]
     }),
 
     ok = hakisql:insert(test, [
@@ -76,7 +76,10 @@ simple_in_test() ->
         #{a => test4, b => 24, c => 12.1, name => "F"}
     ]),
 
-    {ok, [#{a := [test, test5], b := 2, c := 3.1, name := "A"}]} = hakisql:q(test_in, "a in (test5, test4)").
+    {ok, Result} = hakisql:q(test_in, "a in (test5, test4, not_exiting)"),
+
+    [#{a := [test, test5], b := 2, c := 3.1, name := "A"},
+     #{a := test4, b := 24, c := 12.1, name := "F"}] = Result.
 
 
 range_test() ->

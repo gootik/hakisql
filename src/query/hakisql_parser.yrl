@@ -64,8 +64,8 @@ literal -> int : value('$1').
 literal -> float : value('$1').
 literal -> string : value('$1').
 
-atom_commalist -> atom : ['$1'].
 atom_commalist -> atom_commalist ',' atom : flatten(['$1', '$3']).
+atom_commalist -> atom : ['$1'].
 
 Erlang code.
 

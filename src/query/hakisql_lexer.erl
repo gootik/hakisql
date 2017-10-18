@@ -26,6 +26,7 @@ quoted_bitstring(TokenChars, TokenLen) ->
 reserved_word('has') -> true;
 reserved_word('and') -> true;
 reserved_word('in') -> true;
+reserved_word('not') -> true;
 reserved_word('or') -> true;
 reserved_word(_) -> false.
 
@@ -322,7 +323,7 @@ adjust_line(T, A, [_|Cs], L) ->
 %% return signal either an unrecognised character or end of current
 %% input.
 
--file("/Users/sasan.hezarkhani/MyWork/hakisql/_build/test/lib/hakisql/src/query/hakisql_lexer.erl", 325).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/_build/test/lib/hakisql/src/query/hakisql_lexer.erl", 326).
 yystate() -> 15.
 
 yystate(18, [95|Ics], Line, Tlen, _, _) ->

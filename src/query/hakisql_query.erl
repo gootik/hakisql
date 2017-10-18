@@ -19,7 +19,10 @@ rows_for_query(TableName, Query) ->
 
 parse_query(Query) ->
     {ok, Lex, _} = hakisql_lexer:string(Query),
-    hakisql_parser:parse(Lex).
+    io:format(user, "Lex: ~p~n", [Lex]),
+    {ok, A} = hakisql_parser:parse(Lex),
+    io:format(user, "A: ~p~n", [A]),
+    {ok, A}.
 
 query_to_bitmap(Schema, {'or', Lterm, Rterm}) ->
     bitmap:union(

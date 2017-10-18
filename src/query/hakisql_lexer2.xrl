@@ -19,6 +19,7 @@ and        : {token, {'and', TokenLine, atom(TokenChars)}}.
 {L}+       : {token, {var, TokenLine, atom(TokenChars)}}.
 
 {D}+       : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
+{D}+\.{D}+ : {token, {float, TokenLine, list_to_integer(TokenChars)}}.
 
 [(),]      : {token, {atom(TokenChars), TokenLine}}.
 
@@ -26,7 +27,8 @@ and        : {token, {'and', TokenLine, atom(TokenChars)}}.
 
 Erlang code.
 
-atom(TokenChars) -> list_to_atom(string:to_lower(TokenChars)).
+atom(TokenChars) ->
+    list_to_atom(string:to_lower(TokenChars)).
 
 strip(TokenChars,TokenLen) ->
     lists:sublist(TokenChars, 2, TokenLen - 2).

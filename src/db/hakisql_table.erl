@@ -1,6 +1,7 @@
 -module(hakisql_table).
 
 -include("internal.hrl").
+-include("types.hrl").
 
 -export([
     create/2,
@@ -12,13 +13,13 @@
 %% @doc Given a column definition map this will create a new table
 %%      ready to be populated.
 %% @end
--spec create(atom(), map()) -> ok.
-create(TableName, Schema) ->
+-spec create(table_name(), table_column_definition()) -> ok.
+create(TableName, ColumnDefinition) ->
     SchemaTableName = internal_table_name(schema, TableName),
     IndexTableName = internal_table_name(index, TableName),
-    IndexFieldNames = schema_index_fields(Schema),
+    IndexFieldNames = schema_index_fields(ColumnDefinition),
 
-    InternalSchema = #{cols => Schema,
+    InternalSchema = #{cols => ColumnDefinition,
                        num_rows => 0,
                        table_name => TableName,
                        index_table => IndexTableName,
@@ -28,7 +29,7 @@ create(TableName, Schema) ->
 
 %% @doc Will insert the rows in the given table and update index mappings.
 %% @end
--spec insert(atom(), [map()]) -> ok.
+-spec insert(table_name(), [map()]) -> ok.
 insert(TableName, Rows) ->
     Schema = schema_for_table(TableName),
 
@@ -48,7 +49,7 @@ insert(TableName, Rows) ->
 
 %% @doc Will return the internal schema for the given table.
 %% @end
--spec schema_for_table(atom()) -> map() | error.
+-spec schema_for_table(table_name()) -> map() | error.
 schema_for_table(TableName) ->
     case haki:get(internal_table_name(schema, TableName)) of
         bad_key -> error(no_table);

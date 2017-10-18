@@ -12,6 +12,7 @@ Terminals
     var
     integer
     string
+    float
     'in'
     'or'
     'and'
@@ -40,6 +41,7 @@ elements -> element ',' elements : ['$1'] ++ '$3'.
 element -> atom : '$1'.
 element -> var : unwrap('$1').
 element -> integer : unwrap('$1').
+element -> float : unwrap('$1').
 element -> string : unwrap('$1').
 
 Erlang code.

@@ -1,5 +1,5 @@
 {application, hakisql,
- [{description, "An OTP library"},
+ [{description, "Fast in-memory datastore with SQL like query language."},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,
@@ -12,7 +12,7 @@
   {modules, []},
   {mod, {hakisql_app, []}},
 
-  {maintainers, []},
-  {licenses, ["Apache 2.0"]},
-  {links, []}
+  {maintainers, ["Sasan Hezarkhani", "Ahmed Mokhtar"]},
+  {licenses, ["MIT"]},
+  {links, [{github, "https://github.com/gootik/hakisql"}]}
  ]}.

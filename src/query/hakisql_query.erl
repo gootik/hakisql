@@ -1,21 +1,13 @@
 -module(hakisql_query).
 
 -export([
-    rows_for_query/2
+    bitmap_for_query/2
 ]).
 
-rows_for_query(TableName, Query) ->
-    try
-        Schema = hakisql_table:schema_for_table(TableName),
-        {ok, AQT} = parse_query(Query),
-        Bitmap = query_to_bitmap(Schema, AQT),
-        Result = fetch_using_bitmap(TableName, Bitmap),
-
-        {ok, Result}
-    catch
-        error:Reason ->
-            {error, Reason, []}
-    end.
+bitmap_for_query(TableName, Query) ->
+    Schema = hakisql_table:schema_for_table(TableName),
+    {ok, AQT} = parse_query(Query),
+    query_to_bitmap(Schema, AQT).
 
 parse_query(Query) ->
     {ok, Lex, _} = hakisql_lexer2:string(Query),
@@ -61,15 +53,6 @@ query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'o
 
 query_to_bitmap(_, {'op', _, _, _}) ->
     error(not_implemented).
-
-fetch_using_bitmap(Table, Bitmap) ->
-    Rows = bitmap:to_list(Bitmap),
-
-    [begin
-         RowKey = list_to_atom(integer_to_list(Row)),
-         haki:get(Table, RowKey)
-     end || Row <- Rows].
-
 
 field_value_bitmap(IndexTable, Field, Value, Default) ->
     case haki:get(IndexTable, Field) of

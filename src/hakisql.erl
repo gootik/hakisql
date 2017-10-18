@@ -22,4 +22,12 @@ insert(TableName, Rows) ->
 %% @doc Run a query on a table and return the result.
 -spec q(table_name(), string()) -> {ok, [map()]} | {error, Reason :: atom(), []}.
 q(TableName, Query) ->
-    hakisql_query:rows_for_query(TableName, Query).
+    try
+        Bitmap = hakisql_query:bitmap_for_query(TableName, Query),
+        Rows = hakisql_table:fetch_using_bitmap(TableName, Bitmap),
+
+        {ok, Rows}
+    catch
+        error:Reason ->
+            {error, Reason, []}
+    end.

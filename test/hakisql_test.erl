@@ -76,7 +76,7 @@ simple_in_test() ->
         #{a => test4, b => 24, c => 12.1, name => "F"}
     ]),
 
-    {ok, Result} = hakisql:q(test_in, "a in (test5, test4)"),
+    {ok, Result} = hakisql:q(test_in, "a in (test5, test4, not_exiting)"),
 
     [#{a := [test, test5], b := 2, c := 3.1, name := "A"},
      #{a := test4, b := 24, c := 12.1, name := "F"}] = Result.

@@ -1,7 +1,7 @@
 Definitions.
 
 D   = [0-9]
-L   = [A-Za-z][[A-Za-z0-9]*
+L   = [A-Za-z][[A-Za-z0-9_]*
 WS  = ([\000-\s]|%.*)
 OPERATOR = (<|<=|=|=>|>|!=)
 

@@ -6,6 +6,7 @@
 -export([
     create/2,
     insert/2,
+    fetch_using_bitmap/2,
 
     schema_for_table/1
 ]).
@@ -56,9 +57,21 @@ schema_for_table(TableName) ->
         Schema -> Schema
     end.
 
+%% @doc Given a bitmap, we will fetch all the rows defined in the bitmap
+%%      and return the result. The order of result is not guaranteed.
+%% @end
+-spec fetch_using_bitmap(table_name(), bitmap:bitmap()) -> [map()].
+fetch_using_bitmap(TableName, Bitmap) ->
+    Rows = bitmap:to_list(Bitmap),
+
+    lists:map(
+        fun(Row) ->
+            RowKey = list_to_atom(integer_to_list(Row)),
+            haki:get(TableName, RowKey)
+        end, Rows).
 
 internal_table_name(schema, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX);
-internal_table_name(index, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?INDEX_TABLE_POSTFIX).
+internal_table_name(index, TableName)  -> list_to_atom(atom_to_list(TableName) ++ ?INDEX_TABLE_POSTFIX).
 
 schema_index_fields(Columns) ->
     lists:filtermap(

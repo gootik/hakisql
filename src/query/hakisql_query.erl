@@ -36,31 +36,28 @@ query_to_bitmap(Schema, {'and', Lterm, Rterm}) ->
 query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', '=', Field, Value}) ->
     {ok, EmptyField} = bitmap:new([{size, NumRows}]),
 
-    case haki:get(IndexTable, Field) of
-        bad_key -> EmptyField;
-        FieldMap -> maps:get(Value, FieldMap, EmptyField)
-    end;
-
-query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'has', Field, Value}) ->
-    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
-
     field_value_bitmap(IndexTable, Field, Value, EmptyField);
-
-query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'in', Field, {list, Values}}) ->
-    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
-
-    lists:foldl(
-        fun(Value, Acc) ->
-            bitmap:union(
-                Acc,
-                field_value_bitmap(IndexTable, Field, Value, EmptyField))
-        end, EmptyField, Values);
 
 query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', '!=', Field, Value}) ->
     {ok, EmptyField} = bitmap:new([{size, NumRows}]),
 
     Bitmap = field_value_bitmap(IndexTable, Field, Value, EmptyField),
     bitmap:invert(Bitmap);
+
+query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'has', Field, Value}) ->
+    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
+    field_value_bitmap(IndexTable, Field, Value, EmptyField);
+
+query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'in', Field, {list, Values}}) ->
+    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
+
+    %% Union of all field bitmaps
+    lists:foldl(
+        fun(Value, Acc) ->
+            bitmap:union(
+                Acc,
+                field_value_bitmap(IndexTable, Field, Value, EmptyField))
+        end, EmptyField, Values);
 
 query_to_bitmap(_, {'op', _, _, _}) ->
     error(not_implemented).

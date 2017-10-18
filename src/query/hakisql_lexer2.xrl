@@ -26,7 +26,8 @@ and        : {token, {'and', TokenLine, atom(TokenChars)}}.
 
 Erlang code.
 
-atom(TokenChars) -> list_to_atom(string:to_lower(TokenChars)).
+atom(TokenChars) ->
+    list_to_atom(string:to_lower(TokenChars)).
 
 strip(TokenChars,TokenLen) ->
     lists:sublist(TokenChars, 2, TokenLen - 2).

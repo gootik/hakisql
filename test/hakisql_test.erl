@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-simple_test() ->
+simple_eq_test() ->
     ok = hakisql:create(test, #{
         a => [index, atom],
         b => [index, number],
@@ -81,6 +81,24 @@ simple_in_test() ->
     [#{a := [test, test5], b := 2, c := 3.1, name := "A"},
      #{a := test4, b := 24, c := 12.1, name := "F"}] = Result.
 
+simple_string_test() ->
+    ok = hakisql:create(test_string, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [number],
+        name => [index, string]
+    }),
+
+    ok = hakisql:insert(test_string, [
+        #{a => [test, test5], b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 24, c => 12.1, name => "B"},
+        #{a => test, b => 24, c => 12.1, name => "C"},
+        #{a => test2, b => 24, c => 12.1, name => "D"},
+        #{a => test, b => 24, c => 12.1, name => "E"},
+        #{a => test4, b => 24, c => 12.1, name => "F"}
+    ]),
+
+    {ok, [#{a := test2, b := 24, c := 12.1, name := "D"}]} = hakisql:q(test_string, "name = 'D'").
 
 range_test() ->
     hakisql:create(range_test, #{

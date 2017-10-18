@@ -21,4 +21,3 @@ insert(TableName, Rows) ->
 -spec q(atom(), list()) -> {ok, list()} | {error, Reason :: atom(), []}.
 q(TableName, Query) ->
     hakisql_query:rows_for_query(TableName, Query).
-

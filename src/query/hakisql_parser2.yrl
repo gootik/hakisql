@@ -1,8 +1,22 @@
 Nonterminals
-predicates predicate list element elements.
+    predicates
+    predicate
+    list
+    element
+    elements.
 
-Terminals '(' ')' ','
-atom var integer string 'in' 'or' 'and' 'op' 'has'.
+Terminals
+    '(' ')'
+    ','
+    atom
+    var
+    integer
+    string
+    'in'
+    'or'
+    'and'
+    'op'
+    'has'.
 
 Rootsymbol predicates.
 

@@ -12,6 +12,7 @@ Terminals
     var
     integer
     string
+    float
     'in'
     'or'
     'and'

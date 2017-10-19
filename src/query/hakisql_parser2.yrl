@@ -12,6 +12,7 @@ Terminals
     var
     integer
     string
+    binary
     float
     'not'
     'in'
@@ -46,6 +47,7 @@ element -> var : unwrap('$1').
 element -> integer : unwrap('$1').
 element -> float : unwrap('$1').
 element -> string : unwrap('$1').
+element -> binary : unwrap('$1').
 
 Erlang code.
 

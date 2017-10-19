@@ -14,6 +14,7 @@ Terminals
     string
     binary
     float
+    tuple
     'not'
     'in'
     'or'
@@ -48,6 +49,7 @@ element -> integer : unwrap('$1').
 element -> float : unwrap('$1').
 element -> string : unwrap('$1').
 element -> binary : unwrap('$1').
+element -> tuple : unwrap('$1').
 
 Erlang code.
 

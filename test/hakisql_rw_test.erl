@@ -32,4 +32,4 @@ campaign_test() ->
     ok = hakisql:create(test_campaign, Table),
     ok = hakisql:insert(test_campaign, [Sample]),
 
-    {ok, [#{id => <<"526ea26fb18bc0751d000027">>}]} = hakisql:q(test_campaign, "blacklist has <<'507686ae771615941001aca5'>>").
+    {ok, [#{id := <<"526ea26fb18bc0751d000027">>}]} = hakisql:q(test_campaign, "blacklist has <<'507686ae771615941001aca5'>>").

@@ -15,13 +15,13 @@ not        : {token, {'not', TokenLine, atom(TokenChars)}}.
 
 {OPERATOR} : {token, {op, TokenLine, atom(TokenChars)}}.
 
+{D}+       : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
+{D}+\.{D}+ : {token, {float, TokenLine, list_to_integer(TokenChars)}}.
+
 '{L}+'     : {token, {string, TokenLine, strip(TokenChars,TokenLen)}}.
 <<'{L}+'>> : {token, {binary, TokenLine, token_to_binary(TokenChars, TokenLen)}}.
 
 {L}+       : {token, {var, TokenLine, atom(TokenChars)}}.
-
-{D}+       : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
-{D}+\.{D}+ : {token, {float, TokenLine, list_to_integer(TokenChars)}}.
 
 [(),]      : {token, {atom(TokenChars), TokenLine}}.
 

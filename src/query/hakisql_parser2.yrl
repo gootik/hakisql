@@ -12,6 +12,7 @@ Terminals
     var
     integer
     string
+    binary
     float
     'not'
     'in'

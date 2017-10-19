@@ -19,16 +19,9 @@ To learn about Bitmap indexes and fast datastore access path problems.
 Does not exist. Restart the VM and your data is gone :)
 
 ### TODO
-1. ~~Store records~~
-2. ~~Array values~~
-3. Range query use range bitmap index
-4. Cleanup code
-5. ~~String comparisons~~
-6. More operators
-   - Range queries
-   - ~~NOT IN~~
-   - 
-7. Custom filtering funs?! like ets:fun2ms()
+1. Range query use range bitmap index 
+2. Custom filtering funs?! like ets:fun2ms()
+3. Inserting rows need to recalculate index
 
 ### Example 
 ```erlang

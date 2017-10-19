@@ -64,7 +64,7 @@ query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'o
 
     bitmap:invert(Bitmap);
 
-query_to_bitmap(_, {'op', _, _, _}) ->
+query_to_bitmap(_, _) ->
     error(not_implemented).
 
 field_value_bitmap(IndexTable, Field, Value, Default) ->

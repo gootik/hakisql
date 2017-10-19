@@ -6,8 +6,8 @@
 
 bitmap_for_query(TableName, Query) ->
     Schema = hakisql_table:schema_for_table(TableName),
-    {ok, AQT} = parse_query(Query),
-    query_to_bitmap(Schema, AQT).
+    {ok, ParserTree} = parse_query(Query),
+    query_to_bitmap(Schema, ParserTree).
 
 parse_query(Query) ->
     {ok, Lex, _} = hakisql_lexer2:string(Query),

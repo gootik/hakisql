@@ -23,6 +23,8 @@ not        : {token, {'not', TokenLine, atom(TokenChars)}}.
 
 {L}+       : {token, {var, TokenLine, atom(TokenChars)}}.
 
+{.*}       : {token, {tuple, TokenLine, token_to_tuple(TokenChars, TokenLen)}}.
+
 [(),]      : {token, {atom(TokenChars), TokenLine}}.
 
 {WS}+      : skip_token.
@@ -38,3 +40,9 @@ strip(TokenChars, TokenLen) ->
 token_to_binary(TokenChars, TokenLen) ->
     L = lists:sublist(TokenChars, 4, TokenLen - 6),
     list_to_binary(L).
+
+%% OMG HAX
+token_to_tuple(TokenChars, _TokenLen) ->
+    {ok, L, _} = erl_scan:string(TokenChars ++ "."),
+    {ok, T} = erl_parse:parse_term(L),
+    T.

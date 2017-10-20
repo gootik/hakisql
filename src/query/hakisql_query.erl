@@ -1,9 +1,15 @@
 -module(hakisql_query).
 
+-include("types.hrl").
+
 -export([
     bitmap_for_query/2
 ]).
 
+%% @doc Given a query string this function will return a bitmap with right
+%%      row bits set.
+%% @end
+-spec bitmap_for_query(table_name(), select_query()) -> bitmap:bitmap().
 bitmap_for_query(TableName, Query) ->
     Schema = hakisql_table:schema_for_table(TableName),
     {ok, ParserTree} = parse_query(Query),

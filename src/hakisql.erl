@@ -15,12 +15,12 @@ create(TableName, ColumnDefinition) ->
     hakisql_table:create(TableName, ColumnDefinition).
 
 %% @doc Insert rows into a table.
--spec insert(table_name(), [map()]) -> ok.
+-spec insert(table_name(), [table_row()]) -> ok.
 insert(TableName, Rows) ->
     hakisql_table:insert(TableName, Rows).
 
 %% @doc Run a query on a table and return the result.
--spec q(table_name(), string()) -> {ok, [map()]} | {error, Reason :: atom(), []}.
+-spec q(table_name(), select_query()) -> {ok, [table_row()]} | {error, Reason :: atom(), []}.
 q(TableName, Query) ->
     try
         Bitmap = hakisql_query:bitmap_for_query(TableName, Query),

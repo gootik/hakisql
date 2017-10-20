@@ -1,7 +1,6 @@
 -module(hakisql_table).
 
 -include("internal.hrl").
--include("types.hrl").
 
 -export([
     create/2,
@@ -30,7 +29,7 @@ create(TableName, ColumnDefinition) ->
 
 %% @doc Will insert the rows in the given table and update index mappings.
 %% @end
--spec insert(table_name(), [map()]) -> ok.
+-spec insert(table_name(), [table_row()]) -> ok.
 insert(TableName, Rows) ->
     Schema = schema_for_table(TableName),
 
@@ -60,7 +59,7 @@ schema_for_table(TableName) ->
 %% @doc Given a bitmap, we will fetch all the rows defined in the bitmap
 %%      and return the result. The order of result is not guaranteed.
 %% @end
--spec fetch_using_bitmap(table_name(), bitmap:bitmap()) -> [map()].
+-spec fetch_using_bitmap(table_name(), bitmap:bitmap()) -> [table_row()].
 fetch_using_bitmap(TableName, Bitmap) ->
     Rows = bitmap:to_list(Bitmap),
 

@@ -6,7 +6,7 @@
 
 -type column_name() :: atom().
 -type column_property() :: col_indexing_options() | col_types().
--type column_value() :: any().
+-type column_value() :: list() | string() | atom() | number() | tuple() | bitstring().
 
 -type col_indexing_options() :: index.
 -type col_types() :: string | number | atom.

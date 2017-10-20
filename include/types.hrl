@@ -1,3 +1,6 @@
+-ifndef(_TYPES_H_).
+-define(_TYPES_H_, true).
+
 -type table_name() :: atom().
 -type table_column_definition() :: #{column_name() => [column_property()]}.
 -type table_row() :: map().
@@ -17,3 +20,5 @@
 
     select_query/0
 ]).
+
+-endif.

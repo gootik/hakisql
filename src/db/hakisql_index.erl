@@ -1,6 +1,6 @@
 -module(hakisql_index).
 
--include("types.hrl").
+-include("internal.hrl").
 
 -export([
     calculate_index_map/3
@@ -52,7 +52,7 @@
 %%      will let us to be able to run queries like `a has test3`. Which actually
 %%      would translate into `a = test3` for the bitmap translation.
 %% @end
--spec calculate_index_map(map(), [table_row()], non_neg_integer()) -> map().
+-spec calculate_index_map(internal_schema(), [table_row()], non_neg_integer()) -> map().
 calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, NumRows) ->
 
     InitMap = lists:foldl(

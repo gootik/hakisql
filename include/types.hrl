@@ -3,13 +3,15 @@
 
 -type table_name() :: atom().
 -type table_column_definition() :: #{column_name() => [column_property()]}.
--type table_row() :: map().
 
 -type column_name() :: atom().
 -type column_property() :: col_indexing_options() | col_types().
+-type column_value() :: any().
 
 -type col_indexing_options() :: index.
 -type col_types() :: string | number | atom.
+
+-type table_row() :: #{column_name() => column_value()}.
 
 -type select_query() :: string().
 

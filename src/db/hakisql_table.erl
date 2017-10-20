@@ -1,7 +1,6 @@
 -module(hakisql_table).
 
 -include("internal.hrl").
--include("types.hrl").
 
 -export([
     create/2,

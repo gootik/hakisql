@@ -22,6 +22,7 @@ Does not exist. Restart the VM and your data is gone :)
 1. Range query use range bitmap index 
 2. Custom filtering funs?! like ets:fun2ms()
 3. Inserting rows need to recalculate index
+4. Create views
 
 ### Example 
 ```erlang

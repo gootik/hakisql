@@ -76,8 +76,8 @@ simple_in_test() ->
         #{a => test4, b => 24, c => 12.1, name => "F"}
     ]),
 
-    ExpectedResult = [#{a => [test, test5], b => 2, c => 3.1, name => "A"},
-                      #{a => test4, b => 24, c => 12.1, name => "F"}],
+    ExpectedResult = [#{a => test4, b => 24, c => 12.1, name => "F"},
+                      #{a => [test, test5], b => 2, c => 3.1, name => "A"}],
 
     {ok, Result} = hakisql:q(test_in, "a in (test5, test4, not_exiting)"),
 
@@ -100,8 +100,8 @@ simple_not_in_test() ->
         #{a => test4, b => 24, c => 12.1, name => "F"}
     ]),
 
-    ExpectedResult = [#{a => test, b => 24, c => 12.1, name => "C"},
-                      #{a => test, b => 24, c => 12.1, name => "E"}],
+    ExpectedResult = [#{a => test, b => 24, c => 12.1, name => "E"},
+                      #{a => test, b => 24, c => 12.1, name => "C"}],
 
     {ok, Result} = hakisql:q(test_in, "a not in (test5, test2, test4, not_exiting)"),
 

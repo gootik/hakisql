@@ -1,5 +1,7 @@
 -module(hakisql_table).
 
+-include_lib("metronome/include/metronome.hrl").
+
 -include("internal.hrl").
 
 -export([
@@ -35,12 +37,11 @@ insert(TableName, Rows) ->
 
     {EnrichedRows, {RowMap, NumRows}} = lists:mapfoldl(
         fun(RowMap, {AccMap, RowId}) ->
-            RowKey = list_to_atom(integer_to_list(RowId)),
-            {RowMap#{'_id' => RowId}, {AccMap#{RowKey => RowMap}, RowId + 1}}
+            {RowMap#{'_id' => RowId}, {AccMap#{RowId => RowMap}, RowId + 1}}
         end, {#{}, maps:get(num_rows, Schema)}, Rows),
 
     haki:cache(internal_table_name(schema, TableName), Schema#{num_rows => NumRows}),
-    haki:cache_bucket(TableName, RowMap, #{compiler => haki_beam_compiler}),
+    haki:cache_bucket(TableName, RowMap),
 
     %% TODO: Need to UPDATE indexes not rebuild using only newly added rows.
     IndexMap = hakisql_index:calculate_index_map(Schema, EnrichedRows, NumRows),
@@ -61,12 +62,8 @@ schema_for_table(TableName) ->
 %% @end
 -spec fetch_using_bitmap(table_name(), bitmap:bitmap()) -> [table_row()].
 fetch_using_bitmap(TableName, Bitmap) ->
-    Rows = bitmap:to_list(Bitmap),
-
-    [begin
-         RowKey = list_to_atom(integer_to_list(Row)),
-         haki:get(TableName, RowKey)
-     end || Row <- Rows].
+    TableMod = haki_compiler:mod_name(TableName),
+    ?timed(fetch, traverse_bitmap(TableMod, Bitmap)).
 
 internal_table_name(schema, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX);
 internal_table_name(index, TableName)  -> list_to_atom(atom_to_list(TableName) ++ ?INDEX_TABLE_POSTFIX).
@@ -79,3 +76,14 @@ schema_index_fields(Columns) ->
                 false -> false
             end
         end, maps:to_list(Columns)).
+
+traverse_bitmap(TableMod, <<Size:64/unsigned, Bitmap:Size/bitstring, _/bitstring>>) ->
+    traverse_bitmap(TableMod, Bitmap, 0, []).
+
+traverse_bitmap(_, <<>>, _, Acc) ->
+    Acc;
+traverse_bitmap(TableMod, <<0:1, Rest/bitstring>>, RowId, Acc) ->
+    traverse_bitmap(TableMod, Rest, RowId + 1, Acc);
+traverse_bitmap(TableMod, <<1:1, Rest/bitstring>>, RowId, Acc) ->
+    R = TableMod:get(RowId),
+    traverse_bitmap(TableMod, Rest, RowId + 1, [R | Acc]).

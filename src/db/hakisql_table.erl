@@ -1,5 +1,10 @@
 -module(hakisql_table).
 
+-compile(inline).
+-compile({inline_size, 520}).
+-compile({inline_effort, 500}).
+-compile(inline_list_funcs).
+
 -include_lib("metronome/include/metronome.hrl").
 
 -include("internal.hrl").
@@ -34,11 +39,12 @@ create(TableName, ColumnDefinition) ->
 -spec insert(table_name(), [table_row()]) -> ok.
 insert(TableName, Rows) ->
     Schema = schema_for_table(TableName),
+    InitialNumRows = maps:get(num_rows, Schema),
 
     {EnrichedRows, {RowMap, NumRows}} = lists:mapfoldl(
         fun(RowMap, {AccMap, RowId}) ->
             {RowMap#{'_id' => RowId}, {AccMap#{RowId => RowMap}, RowId + 1}}
-        end, {#{}, maps:get(num_rows, Schema)}, Rows),
+        end, {#{}, InitialNumRows}, Rows),
 
     haki:cache(internal_table_name(schema, TableName), Schema#{num_rows => NumRows}),
     haki:cache_bucket(TableName, RowMap),
@@ -63,15 +69,15 @@ schema_for_table(TableName) ->
 -spec fetch_using_bitmap(table_name(), bitmap:bitmap()) -> [table_row()].
 fetch_using_bitmap(TableName, Bitmap) ->
     TableMod = haki_compiler:mod_name(TableName),
-    ?timed(fetch, traverse_bitmap(TableMod, Bitmap)).
+    traverse_bitmap(TableMod, Bitmap).
 
 internal_table_name(schema, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX);
 internal_table_name(index, TableName)  -> list_to_atom(atom_to_list(TableName) ++ ?INDEX_TABLE_POSTFIX).
 
 schema_index_fields(Columns) ->
     lists:filtermap(
-        fun({Field, SchemaDef}) ->
-            case lists:member(index, SchemaDef) of
+        fun({Field, ColDef}) ->
+            case lists:member(index, ColDef) of
                 true -> {true, Field};
                 false -> false
             end

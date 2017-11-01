@@ -1,5 +1,10 @@
 -module(hakisql_index).
 
+-compile(inline).
+-compile({inline_size, 520}).
+-compile({inline_effort, 500}).
+-compile(inline_list_funcs).
+
 -include("internal.hrl").
 
 -export([

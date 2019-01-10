@@ -59,7 +59,8 @@ query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'o
         fun(Value, Acc) ->
             bitmap:union(
                 Acc,
-                field_value_bitmap(IndexTable, Field, Value, EmptyField))
+                field_value_bitmap(IndexTable, Field, Value, EmptyField)
+            )
         end, EmptyField, Values);
 
 query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'notin', Field, {list, Values}}) ->
@@ -70,7 +71,8 @@ query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'o
         fun(Value, Acc) ->
             bitmap:union(
                 Acc,
-                field_value_bitmap(IndexTable, Field, Value, EmptyField))
+                field_value_bitmap(IndexTable, Field, Value, EmptyField)
+            )
         end, EmptyField, Values),
 
     bitmap:invert(Bitmap);

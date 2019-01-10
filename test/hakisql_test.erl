@@ -126,24 +126,24 @@ simple_string_test() ->
 
     {ok, [#{a := test2, b := 24, c := 12.1, name := "D"}]} = hakisql:q(test_string, "name = 'D'").
 
-range_test() ->
-    hakisql:create(range_test, #{
-        b => [index]
-    }),
-
-    ok = hakisql:insert(range_test, [
-        #{a => test, b => 2, c => 3.1, name => "A"},
-        #{a => test, b => 3, c => 3.1, name => "A"},
-        #{a => test, b => 4, c => 3.1, name => "A"},
-        #{a => test, b => 5, c => 3.1, name => "A"},
-        #{a => test, b => 6, c => 3.1, name => "A"},
-        #{a => test, b => 10, c => 3.1, name => "A"},
-        #{a => test, b => 400, c => 3.1, name => "A"}
-    ]),
-
-    {ok, _R1} = hakisql:q(test, "b <= 400"),
-    {ok, _R2} = hakisql:q(test, "b <= 2"),
-    {ok, _R3} = hakisql:q(test, "b >= 400"),
-    {ok, _R4} = hakisql:q(test, "b >= 2"),
-
-    {ok, _R5} = hakisql:q(test, "b <= 6 AND b >= 3").
+%range_test() ->
+%    hakisql:create(range_test, #{
+%        b => [index]
+%    }),
+%
+%    ok = hakisql:insert(range_test, [
+%        #{a => test, b => 2, c => 3.1, name => "A"},
+%        #{a => test, b => 3, c => 3.1, name => "A"},
+%        #{a => test, b => 4, c => 3.1, name => "A"},
+%        #{a => test, b => 5, c => 3.1, name => "A"},
+%        #{a => test, b => 6, c => 3.1, name => "A"},
+%        #{a => test, b => 10, c => 3.1, name => "A"},
+%        #{a => test, b => 400, c => 3.1, name => "A"}
+%    ]),
+%
+%    {ok, _R1} = hakisql:q(test, "b <= 400"),
+%    {ok, _R2} = hakisql:q(test, "b <= 2"),
+%    {ok, _R3} = hakisql:q(test, "b >= 400"),
+%    {ok, _R4} = hakisql:q(test, "b >= 2"),
+%
+%    {ok, _R5} = hakisql:q(test, "b <= 6 AND b >= 3").

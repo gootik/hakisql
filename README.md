@@ -53,7 +53,7 @@ ok
 ```
 
 ### References
-The Lexer and Parser code was shamefully copied/modified from [swirl][2].
+The Lexer and Parser code were originally copied/modified from [swirl][2].
 
 
 [1]: https://github.com/gootik/hakicache

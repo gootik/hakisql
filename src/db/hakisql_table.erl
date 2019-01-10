@@ -49,7 +49,7 @@ insert(TableName, Rows) ->
     haki:cache(internal_table_name(schema, TableName), Schema#{num_rows => NumRows}),
     haki:cache_bucket(TableName, RowMap),
 
-    %% TODO: Need to UPDATE indexes not rebuild using only newly added rows.
+    %% TODO(gootik): Need to UPDATE indexes not rebuild. Using only newly added rows.
     IndexMap = hakisql_index:calculate_index_map(Schema, EnrichedRows, NumRows),
 
     haki:cache_bucket(maps:get(index_table, Schema), IndexMap).

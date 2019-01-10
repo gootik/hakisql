@@ -20,7 +20,10 @@ campaign_test() ->
                min_ver => {semver, infinity, 0, 0},
                blacklist => [<<"506481985c7b11ed297dac49">>, <<"507686ae771615941001aca5">>, <<"50ffc8e4a74d0bbc48000006">>],
                tags => [<<"builder">>],
-               extra => #{<<"mute">> => [], <<"postroll_view">> => [<<"https://someurl.com">>]}},
+               extra => #{
+                   <<"mute">> => [],
+                   <<"postroll_view">> => [<<"https://someurl.com">>]
+               }},
 
     ok = hakisql:create(test_campaign, Table),
     ok = hakisql:insert(test_campaign, [Sample]),
@@ -45,7 +48,10 @@ campaign_ver_test() ->
                min_ver => {semver, infinity, 0, 0},
                blacklist => [<<"506481985c7b11ed297dac49">>, <<"507686ae771615941001aca5">>, <<"50ffc8e4a74d0bbc48000006">>],
                tags => [<<"builder">>],
-               extra => #{<<"mute">> => [], <<"postroll_view">> => [<<"https://someurl.com">>]}},
+               extra => #{
+                   <<"mute">> => [],
+                   <<"postroll_view">> => [<<"https://someurl.com">>]
+               }},
 
     ok = hakisql:create(test_campaign_ver, Table),
     ok = hakisql:insert(test_campaign_ver, [Sample]),

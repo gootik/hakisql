@@ -13,7 +13,7 @@
 simple_ets_test() ->
 
     TestDataMap = [
-        #{a => test, b => 2, c => 3.1, name => "A"},
+        #{a => test, b => 2, c => 3.1, name => <<"A">>},
         #{a => test2, b => 24, c => 12.1, name => "B"},
         #{a => test, b => 24, c => 12.1, name => "C"},
         #{a => test2, b => 24, c => 12.1, name => "D"},
@@ -21,7 +21,7 @@ simple_ets_test() ->
         #{a => test4, b => 24, c => 12.1, name => "F"}],
 
     TestDataRec = [
-        #test_record{a = test, b = 2, c = 3.1, name = "A"},
+        #test_record{a = test, b = 2, c = 3.1, name = <<"A">>},
         #test_record{a = test2, b = 24, c = 12.1, name = "B"},
         #test_record{a = test, b = 24, c = 12.1, name = "C"},
         #test_record{a = test2, b = 24, c = 12.1, name = "D"},
@@ -41,20 +41,33 @@ simple_ets_test() ->
     }),
 
     ok = hakisql:insert(test, TestDataMap),
-    {ok, [#{a := test, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "b = 2"),
+    {ok, [#{a := test, b := 2, c := 3.1, name := <<"A">>}]} = hakisql:q(test, "b = 2"),
 
     MatchSpec = ets:fun2ms(fun(#test_record{b = B} = R) when B =:= 2 -> R end),
 
-    EtsTiming = timing:function(
+    %% Warmup
+    timing:function(fun() -> [#test_record{a = test, b = 2, c = 3.1, name = <<"A">>}] = ets:select(test_table, MatchSpec) end, 1000),
+    timing:function(fun() -> {ok, [#{a := test, b := 2, c := 3.1, name := <<"A">>}]} = hakisql:q(test, "b = 2") end, 1000),
+
+    StartMem = erlang:memory(processes),
+    _EtsTiming = timing:function(
         fun() ->
-            [#test_record{a = test, b = 2, c = 3.1, name = "A"}] = ets:select(test_table, MatchSpec)
+            [#test_record{a = test, b = 2, c = 3.1, name = <<"A">>}] = ets:select(test_table, MatchSpec)
+        end, 1000),
+    EndMem = erlang:memory(processes),
+
+    io:format("ETS Mem Diff ~p~n", [EndMem - StartMem]),
+
+    StartMem2 = erlang:memory(processes),
+    _HakiTiming = timing:function(
+        fun() ->
+            {ok, [#{a := test, b := 2, c := 3.1, name := <<"A">>}]} = hakisql:q(test, "b = 2")
         end, 1000),
 
-    HakiTiming = timing:function(
-        fun() ->
-            {ok, [#{a := test, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "b = 2")
-        end, 1000),
+    EndMem2 = erlang:memory(processes),
 
-    io:format("ETS: ~p~n", [EtsTiming]),
-    io:format("HAKI: ~p~n", [HakiTiming]).
+    io:format("Haki Mem Diff ~p~n", [EndMem2 - StartMem2]),
+
+    ets:delete(test_table),
+    hakisql:drop(test).
 

@@ -11,6 +11,7 @@
 
 -export([
     create/2,
+    drop/1,
     insert/2,
     fetch_using_bitmap/2,
 
@@ -33,6 +34,21 @@ create(TableName, ColumnDefinition) ->
                        index_field_names => IndexFieldNames},
 
     haki:cache(SchemaTableName, InternalSchema).
+
+-spec drop(table_name()) -> ok.
+drop(TableName) ->
+    SchemaTableName = internal_table_name(schema, TableName),
+    IndexTableName = internal_table_name(index, TableName),
+
+    lists:foreach(
+        fun(I) ->
+            Mod = list_to_atom("haki_" ++ atom_to_list(I)),
+
+            code:purge(Mod),
+            code:delete(Mod)
+        end, [SchemaTableName, IndexTableName, TableName]),
+    ok.
+
 
 %% @doc Will insert the rows in the given table and update index mappings.
 %% @end

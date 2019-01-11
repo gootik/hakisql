@@ -11,6 +11,7 @@
 
 -export([
     create/2,
+    drop/1,
     insert/2,
     fetch_using_bitmap/2,
 
@@ -34,6 +35,21 @@ create(TableName, ColumnDefinition) ->
 
     haki:cache(SchemaTableName, InternalSchema).
 
+-spec drop(table_name()) -> ok.
+drop(TableName) ->
+    SchemaTableName = internal_table_name(schema, TableName),
+    IndexTableName = internal_table_name(index, TableName),
+
+    lists:foreach(
+        fun(I) ->
+            Mod = list_to_atom("haki_" ++ atom_to_list(I)),
+
+            code:purge(Mod),
+            code:delete(Mod)
+        end, [SchemaTableName, IndexTableName, TableName]),
+    ok.
+
+
 %% @doc Will insert the rows in the given table and update index mappings.
 %% @end
 -spec insert(table_name(), [table_row()]) -> ok.
@@ -49,7 +65,7 @@ insert(TableName, Rows) ->
     haki:cache(internal_table_name(schema, TableName), Schema#{num_rows => NumRows}),
     haki:cache_bucket(TableName, RowMap),
 
-    %% TODO: Need to UPDATE indexes not rebuild using only newly added rows.
+    %% TODO(gootik): Need to UPDATE indexes not rebuild. Using only newly added rows.
     IndexMap = hakisql_index:calculate_index_map(Schema, EnrichedRows, NumRows),
 
     haki:cache_bucket(maps:get(index_table, Schema), IndexMap).

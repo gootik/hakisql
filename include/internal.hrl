@@ -4,11 +4,12 @@
 -define(SCHEMA_TABLE_POSTFIX, "_schema").
 
 -type internal_schema() :: #{
-    cols => map(),
-    num_rows => pos_integer(),
-    table_name => table_name(),
-    index_table => atom(),
-    index_field_names => [atom()]}.
+    cols := map(),
+    num_rows := pos_integer(),
+    table_name := table_name(),
+    index_table := atom(),
+    index_field_names := [atom()]
+}.
 
 -type index_map() :: #{
     column_name() => #{

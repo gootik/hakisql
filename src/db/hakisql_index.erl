@@ -79,10 +79,11 @@ calculate_index_map(#{index_field_names := IndexFieldNames} = _Schema, Rows, Num
                     FieldMap = maps:get(Field, Acc),
                     Values = case is_list(Value) of
                                  %% TODO: LOL this is dumb.
-                                 true -> case io_lib:printable_list(Value) of
-                                             true -> [Value];
-                                             false -> Value
-                                         end;
+                                 true ->
+                                     case io_lib:printable_list(Value) of
+                                         true -> [Value];
+                                         false -> Value
+                                     end;
                                  false ->
                                      [Value]
                              end,
@@ -101,8 +102,8 @@ index_values(Row, IndexFieldNames) ->
 calculate_field_map(FieldMap, [], _, _) ->
     FieldMap;
 calculate_field_map(FieldMap, [Value | Rest], NumRows, RowId) ->
-%% If the value has not been seen yet, then create a new bitmap with
-%% the specific bit set. If it exists, get it and update it.
+    %% If the value has not been seen yet, then create a new bitmap with
+    %% the specific bit set. If it exists, get it and update it.
     NFM = case maps:is_key(Value, FieldMap) of
               true ->
                   {ok, NewIndex} = bitmap:set(RowId, maps:get(Value, FieldMap)),

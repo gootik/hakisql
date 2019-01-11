@@ -2,8 +2,11 @@
 
 -include("types.hrl").
 
+-include_lib("metronome/include/metronome.hrl").
+
 -export([
     create/2,
+    drop/1,
     insert/2,
 
     q/2
@@ -14,6 +17,10 @@
 create(TableName, ColumnDefinition) ->
     hakisql_table:create(TableName, ColumnDefinition).
 
+-spec drop(table_name()) -> ok.
+drop(TableName) ->
+    hakisql_table:drop(TableName).
+
 %% @doc Insert rows into a table.
 -spec insert(table_name(), [table_row()]) -> ok.
 insert(TableName, Rows) ->
@@ -23,8 +30,14 @@ insert(TableName, Rows) ->
 -spec q(table_name(), select_query()) -> {ok, [table_row()]} | {error, Reason :: atom(), []}.
 q(TableName, Query) ->
     try
+%%        {stopwatch_start, bitmap},
         Bitmap = hakisql_query:bitmap_for_query(TableName, Query),
+%%        {stopwatch_stop},
+
+%%        {stopwatch_start, fetch},
         Rows = hakisql_table:fetch_using_bitmap(TableName, Bitmap),
+%%        {stopwatch_stop},
+
 
         {ok, Rows}
     catch

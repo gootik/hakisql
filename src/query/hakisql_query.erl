@@ -17,67 +17,63 @@
 -spec bitmap_for_query(table_name(), select_query()) -> bitmap:bitmap().
 bitmap_for_query(TableName, Query) ->
     Schema = hakisql_table:schema_for_table(TableName),
+    #{num_rows := NumRows} = Schema,
+
+    {ok, EmptyBitmap} = bitmap:new([{size, NumRows}]),
+    State = #{empty_bitmap => EmptyBitmap},
+
     {ok, ParserTree} = parse_query(Query),
-    query_to_bitmap(Schema, ParserTree).
+    query_to_bitmap(Schema, ParserTree, State).
 
 parse_query(Query) ->
     {ok, Lex, _} = hakisql_lexer2:string(Query),
     hakisql_parser2:parse(Lex).
 
-query_to_bitmap(Schema, {'or', Lterm, Rterm}) ->
+query_to_bitmap(Schema, {'or', Lterm, Rterm}, State) ->
     bitmap:union(
-        query_to_bitmap(Schema, Lterm),
-        query_to_bitmap(Schema, Rterm)
+        query_to_bitmap(Schema, Lterm, State),
+        query_to_bitmap(Schema, Rterm, State)
     );
 
-query_to_bitmap(Schema, {'and', Lterm, Rterm}) ->
+query_to_bitmap(Schema, {'and', Lterm, Rterm}, State) ->
     bitmap:intersection(
-        query_to_bitmap(Schema, Lterm),
-        query_to_bitmap(Schema, Rterm)
+        query_to_bitmap(Schema, Lterm, State),
+        query_to_bitmap(Schema, Rterm, State)
     );
 
-query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', '=', Field, Value}) ->
-    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
+query_to_bitmap(#{index_table := IndexTable} = _Schema, {'op', '=', Field, Value}, #{empty_bitmap := EmptyBitmap} = _State) ->
+    field_value_bitmap(IndexTable, Field, Value, EmptyBitmap);
 
-    field_value_bitmap(IndexTable, Field, Value, EmptyField);
-
-query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', '!=', Field, Value}) ->
-    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
-
-    Bitmap = field_value_bitmap(IndexTable, Field, Value, EmptyField),
+query_to_bitmap(#{index_table := IndexTable} = _Schema, {'op', '!=', Field, Value}, #{empty_bitmap := EmptyBitmap} = _State) ->
+    Bitmap = field_value_bitmap(IndexTable, Field, Value, EmptyBitmap),
     bitmap:invert(Bitmap);
 
-query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'has', Field, Value}) ->
-    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
-    field_value_bitmap(IndexTable, Field, Value, EmptyField);
+query_to_bitmap(#{index_table := IndexTable} = _Schema, {'op', 'has', Field, Value}, #{empty_bitmap := EmptyBitmap} = _State) ->
+    field_value_bitmap(IndexTable, Field, Value, EmptyBitmap);
 
-query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'in', Field, {list, Values}}) ->
-    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
-
+query_to_bitmap(#{index_table := IndexTable} = _Schema, {'op', 'in', Field, {list, Values}}, #{empty_bitmap := EmptyBitmap} = _State) ->
     %% Union of all field bitmaps
     lists:foldl(
         fun(Value, Acc) ->
             bitmap:union(
                 Acc,
-                field_value_bitmap(IndexTable, Field, Value, EmptyField)
+                field_value_bitmap(IndexTable, Field, Value, EmptyBitmap)
             )
-        end, EmptyField, Values);
+        end, EmptyBitmap, Values);
 
-query_to_bitmap(#{index_table := IndexTable, num_rows := NumRows} = _Schema, {'op', 'notin', Field, {list, Values}}) ->
-    {ok, EmptyField} = bitmap:new([{size, NumRows}]),
-
+query_to_bitmap(#{index_table := IndexTable} = _Schema, {'op', 'notin', Field, {list, Values}}, #{empty_bitmap := EmptyBitmap} = _State) ->
     %% Union of all field bitmaps
     Bitmap = lists:foldl(
         fun(Value, Acc) ->
             bitmap:union(
                 Acc,
-                field_value_bitmap(IndexTable, Field, Value, EmptyField)
+                field_value_bitmap(IndexTable, Field, Value, EmptyBitmap)
             )
-        end, EmptyField, Values),
+        end, EmptyBitmap, Values),
 
     bitmap:invert(Bitmap);
 
-query_to_bitmap(_, _) ->
+query_to_bitmap(_, _, _) ->
     error(not_implemented).
 
 field_value_bitmap(IndexTable, Field, Value, Default) ->

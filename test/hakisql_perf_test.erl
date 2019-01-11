@@ -29,9 +29,19 @@ simple_ets_test() ->
         #test_record{a = test4, b = 24, c = 12.1, name = "F"}
     ],
 
+    FinalTestDataMap = lists:foldl(
+        fun(_, Acc) ->
+            [#{a => test, b => 2, c => 3.1, name => <<"A">>} | Acc]
+        end, TestDataMap, lists:seq(0, 1000)),
+
+    FinalTestDataRec = lists:foldl(
+        fun(_, Acc) ->
+            [#test_record{a = test, b = 2, c = 3.1, name = <<"A">>} | Acc]
+        end, TestDataRec, lists:seq(0, 1000)),
+
 
     TestTable = ets:new(test_table, [named_table, public, duplicate_bag]),
-    ets:insert(TestTable, TestDataRec),
+    ets:insert(TestTable, FinalTestDataRec),
 
     ok = hakisql:create(test, #{
         a => [index, atom],
@@ -40,33 +50,27 @@ simple_ets_test() ->
         name => [string]
     }),
 
-    ok = hakisql:insert(test, TestDataMap),
-    {ok, [#{a := test, b := 2, c := 3.1, name := <<"A">>}]} = hakisql:q(test, "b = 2"),
+    ok = hakisql:insert(test, FinalTestDataMap),
+    {ok, _} = hakisql:q(test, "b = 2"),
 
     MatchSpec = ets:fun2ms(fun(#test_record{b = B} = R) when B =:= 2 -> R end),
 
-    %% Warmup
-    timing:function(fun() -> [#test_record{a = test, b = 2, c = 3.1, name = <<"A">>}] = ets:select(test_table, MatchSpec) end, 1000),
-    timing:function(fun() -> {ok, [#{a := test, b := 2, c := 3.1, name := <<"A">>}]} = hakisql:q(test, "b = 2") end, 1000),
-
-    StartMem = erlang:memory(processes),
-    _EtsTiming = timing:function(
+    EtsTiming = timing:function(
         fun() ->
-            [#test_record{a = test, b = 2, c = 3.1, name = <<"A">>}] = ets:select(test_table, MatchSpec)
-        end, 1000),
-    EndMem = erlang:memory(processes),
-
-    io:format("ETS Mem Diff ~p~n", [EndMem - StartMem]),
-
-    StartMem2 = erlang:memory(processes),
-    _HakiTiming = timing:function(
-        fun() ->
-            {ok, [#{a := test, b := 2, c := 3.1, name := <<"A">>}]} = hakisql:q(test, "b = 2")
+            _ = ets:select(test_table, MatchSpec)
         end, 1000),
 
-    EndMem2 = erlang:memory(processes),
+    HakiTiming = timing:function(
+        fun() ->
+            {ok, _} = hakisql:q(test, "b = 2")
+        end, 1000),
 
-    io:format("Haki Mem Diff ~p~n", [EndMem2 - StartMem2]),
+    {min, HakiMin} = lists:keyfind(min, 1, HakiTiming),
+    {min, EtsMin} = lists:keyfind(min, 1, EtsTiming),
+
+    ?assert(EtsMin >= HakiMin),
+
+    io:format("~p(ETS) ~p(Haki)~n", [EtsMin, HakiMin]),
 
     ets:delete(test_table),
     hakisql:drop(test).

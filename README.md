@@ -52,6 +52,11 @@ ok
  #{a => test,b => 8,c => 12.1,name => "E"}]
 ```
 
+### Benchmarks
+TODO.
+
+For small tables, ETS always wins. Bigger tables HakiSQL is much faster and more consistent in timing.
+
 ### References
 The Lexer and Parser code were originally copied/modified from [swirl][2].
 

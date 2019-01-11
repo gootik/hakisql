@@ -46,14 +46,14 @@ simple_ets_test() ->
     ok = hakisql:create(test, #{
         a => [index, atom],
         b => [index, number],
-        c => [number],
+        c => [index, number],
         name => [string]
     }),
 
     ok = hakisql:insert(test, FinalTestDataMap),
-    {ok, _} = hakisql:q(test, "b = 2"),
+    {ok, _} = hakisql:q(test, "b = 2 AND c = 3.1"),
 
-    MatchSpec = ets:fun2ms(fun(#test_record{b = B} = R) when B =:= 2 -> R end),
+    MatchSpec = ets:fun2ms(fun(#test_record{b = B, c = C} = R) when B =:= 2 andalso C =:= 3.1 -> R end),
 
     EtsTiming = timing:function(
         fun() ->
@@ -62,7 +62,7 @@ simple_ets_test() ->
 
     HakiTiming = timing:function(
         fun() ->
-            {ok, _} = hakisql:q(test, "b = 2")
+            {ok, _} = hakisql:q(test, "b = 2 AND c = 3.1")
         end, 1000),
 
     {min, HakiMin} = lists:keyfind(min, 1, HakiTiming),

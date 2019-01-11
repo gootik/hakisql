@@ -30,17 +30,12 @@ insert(TableName, Rows) ->
 -spec q(table_name(), select_query()) -> {ok, [table_row()]} | {error, Reason :: atom(), []}.
 q(TableName, Query) ->
     try
-%%        {stopwatch_start, bitmap},
         Bitmap = hakisql_query:bitmap_for_query(TableName, Query),
-%%        {stopwatch_stop},
 
-%%        {stopwatch_start, fetch},
         Rows = hakisql_table:fetch_using_bitmap(TableName, Bitmap),
-%%        {stopwatch_stop},
-
 
         {ok, Rows}
     catch
-        error:Reason ->
-            {error, Reason, []}
+        error:Reason:Stack ->
+            {error, Reason, Stack, []}
     end.

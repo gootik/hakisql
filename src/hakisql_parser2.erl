@@ -1,6 +1,6 @@
 -module(hakisql_parser2).
 -export([parse/1, parse_and_scan/1, format_error/1]).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 54).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 55).
 
 unwrap({_,_,V}) -> V.
 -file("/Users/sasan.hezarkhani/21.2_hipe_lcnt_dwarf/lib/parsetools-2.1.8/include/yeccpre.hrl", 0).
@@ -242,8 +242,12 @@ yeccpars2(28=S, Cat, Ss, Stack, T, Ts, Tzr) ->
 %%  yeccpars2_30(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(31=S, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_0(S, Cat, Ss, Stack, T, Ts, Tzr);
-%% yeccpars2(32=S, Cat, Ss, Stack, T, Ts, Tzr) ->
-%%  yeccpars2_32(S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccpars2(32=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_0(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(33=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_33(S, Cat, Ss, Stack, T, Ts, Tzr);
+%% yeccpars2(34=S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%%  yeccpars2_34(S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccpars2(Other, _, _, _, _, _, _) ->
  erlang:error({yecc_bug,"1.4",{missing_state_in_action_table, Other}}).
 
@@ -256,8 +260,10 @@ yeccpars2_0(_, _, _, _, T, _, _) ->
 -dialyzer({nowarn_function, yeccpars2_1/7}).
 yeccpars2_1(_S, '$end', _Ss, Stack, _T, _Ts, _Tzr) ->
  {ok, hd(Stack)};
-yeccpars2_1(S, 'or', Ss, Stack, T, Ts, Tzr) ->
+yeccpars2_1(S, 'and', Ss, Stack, T, Ts, Tzr) ->
  yeccpars1(S, 31, Ss, Stack, T, Ts, Tzr);
+yeccpars2_1(S, 'or', Ss, Stack, T, Ts, Tzr) ->
+ yeccpars1(S, 32, Ss, Stack, T, Ts, Tzr);
 yeccpars2_1(_, _, _, _, T, _, _) ->
  yeccerror(T).
 
@@ -411,9 +417,16 @@ yeccpars2_30(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
 
 %% yeccpars2_31: see yeccpars2_0
 
-yeccpars2_32(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+%% yeccpars2_32: see yeccpars2_0
+
+yeccpars2_33(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  [_,_|Nss] = Ss,
- NewStack = yeccpars2_32_(Stack),
+ NewStack = yeccpars2_33_(Stack),
+ yeccgoto_predicates(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
+
+yeccpars2_34(_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ [_,_|Nss] = Ss,
+ NewStack = yeccpars2_34_(Stack),
  yeccgoto_predicates(hd(Nss), Cat, Nss, NewStack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccgoto_element/7}).
@@ -446,14 +459,16 @@ yeccgoto_predicate(27=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
 yeccgoto_predicate(28=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_29(_S, Cat, Ss, Stack, T, Ts, Tzr);
 yeccgoto_predicate(31=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
- yeccpars2_32(_S, Cat, Ss, Stack, T, Ts, Tzr).
+ yeccpars2_34(_S, Cat, Ss, Stack, T, Ts, Tzr);
+yeccgoto_predicate(32=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
+ yeccpars2_33(_S, Cat, Ss, Stack, T, Ts, Tzr).
 
 -dialyzer({nowarn_function, yeccgoto_predicates/7}).
 yeccgoto_predicates(0, Cat, Ss, Stack, T, Ts, Tzr) ->
  yeccpars2_1(1, Cat, Ss, Stack, T, Ts, Tzr).
 
 -compile({inline,yeccpars2_8_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 34).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 35).
 yeccpars2_8_(__Stack0) ->
  [__3,__2,__1 | __Stack] = __Stack0,
  [begin
@@ -461,7 +476,7 @@ yeccpars2_8_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_10_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 47).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 48).
 yeccpars2_10_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
@@ -469,7 +484,7 @@ yeccpars2_10_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_11_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 45).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 46).
 yeccpars2_11_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
@@ -477,7 +492,7 @@ yeccpars2_11_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_12_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 44).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 45).
 yeccpars2_12_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
@@ -485,7 +500,7 @@ yeccpars2_12_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_13_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 46).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 47).
 yeccpars2_13_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
@@ -493,7 +508,7 @@ yeccpars2_13_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_14_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 48).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 49).
 yeccpars2_14_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
@@ -501,7 +516,7 @@ yeccpars2_14_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_15_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 43).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 44).
 yeccpars2_15_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
@@ -509,7 +524,7 @@ yeccpars2_15_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_17_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 30).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 31).
 yeccpars2_17_(__Stack0) ->
  [__4,__3,__2,__1 | __Stack] = __Stack0,
  [begin
@@ -517,7 +532,7 @@ yeccpars2_17_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_20_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 39).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 40).
 yeccpars2_20_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
@@ -525,7 +540,7 @@ yeccpars2_20_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_21_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 36).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 37).
 yeccpars2_21_(__Stack0) ->
  [__2,__1 | __Stack] = __Stack0,
  [begin
@@ -533,7 +548,7 @@ yeccpars2_21_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_23_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 40).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 41).
 yeccpars2_23_(__Stack0) ->
  [__3,__2,__1 | __Stack] = __Stack0,
  [begin
@@ -541,7 +556,7 @@ yeccpars2_23_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_24_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 37).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 38).
 yeccpars2_24_(__Stack0) ->
  [__3,__2,__1 | __Stack] = __Stack0,
  [begin
@@ -549,7 +564,7 @@ yeccpars2_24_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_25_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 29).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 30).
 yeccpars2_25_(__Stack0) ->
  [__3,__2,__1 | __Stack] = __Stack0,
  [begin
@@ -557,7 +572,7 @@ yeccpars2_25_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_26_/1}).
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 32).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 33).
 yeccpars2_26_(__Stack0) ->
  [__3,__2,__1 | __Stack] = __Stack0,
  [begin
@@ -580,13 +595,21 @@ yeccpars2_30_(__Stack0) ->
    { 'and' , __1 , __3 }
   end | __Stack].
 
--compile({inline,yeccpars2_32_/1}).
+-compile({inline,yeccpars2_33_/1}).
 -file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 25).
-yeccpars2_32_(__Stack0) ->
+yeccpars2_33_(__Stack0) ->
  [__3,__2,__1 | __Stack] = __Stack0,
  [begin
    { 'or' , __1 , __3 }
   end | __Stack].
 
+-compile({inline,yeccpars2_34_/1}).
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 28).
+yeccpars2_34_(__Stack0) ->
+ [__3,__2,__1 | __Stack] = __Stack0,
+ [begin
+   { 'and' , __1 , __3 }
+  end | __Stack].
 
--file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 56).
+
+-file("/Users/sasan.hezarkhani/MyWork/hakisql/src/query/hakisql_parser2.yrl", 57).

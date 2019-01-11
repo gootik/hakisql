@@ -16,12 +16,12 @@ not        : {token, {'not', TokenLine, atom(TokenChars)}}.
 {OPERATOR} : {token, {op, TokenLine, atom(TokenChars)}}.
 
 {D}+       : {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
-{D}+\.{D}+ : {token, {float, TokenLine, list_to_integer(TokenChars)}}.
+{D}+\.{D}+ : {token, {float, TokenLine, list_to_float(TokenChars)}}.
 
 '{L}+'     : {token, {string, TokenLine, strip(TokenChars,TokenLen)}}.
 <<'{L}+'>> : {token, {binary, TokenLine, token_to_binary(TokenChars, TokenLen)}}.
 
-{L}+       : {token, {var, TokenLine, atom(TokenChars)}}.
+{L}+       : chars(TokenLine, TokenChars).
 
 {.*}       : {token, {tuple, TokenLine, token_to_tuple(TokenChars, TokenLen)}}.
 
@@ -30,6 +30,20 @@ not        : {token, {'not', TokenLine, atom(TokenChars)}}.
 {WS}+      : skip_token.
 
 Erlang code.
+
+is_query_word('and') -> true;
+is_query_word('in') -> true;
+is_query_word('has') -> true;
+is_query_word('or') -> true;
+is_query_word('not') -> true;
+is_query_word(_) -> false.
+
+chars(TokenLine, TokenChars) ->
+    Word = atom(TokenChars),
+    case is_query_word(Word) of
+        true -> {token, {Word, TokenLine, Word}};
+        false -> {token, {var, TokenLine, Word}}
+    end.
 
 atom(TokenChars) ->
     list_to_atom(string:to_lower(TokenChars)).

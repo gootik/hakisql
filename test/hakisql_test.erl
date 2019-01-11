@@ -70,10 +70,10 @@ simple_and_test() ->
     ok = hakisql:insert(test, [
         #{a => test1, b => 2, c => 3.1, name => "A"},
         #{a => test2, b => 24, c => 12.1, name => "B"},
-        #{a => test, b => 24, c => 12.1, name => "C"},
-        #{a => test2, b => 24, c => 12.1, name => "D"},
-        #{a => test, b => 24, c => 12.1, name => "E"},
-        #{a => test4, b => 24, c => 12.1, name => "F"}
+        #{a => test, b => 24, c => 3.1, name => "C"},
+        #{a => test2, b => 2, c => 12.1, name => "D"},
+        #{a => test, b => 2, c => 12.1, name => "E"},
+        #{a => test4, b => 2, c => 12.1, name => "F"}
     ]),
 
     {ok, [#{a := test1, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "b = 2 AND c = 3.1").

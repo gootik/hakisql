@@ -57,9 +57,12 @@ TODO.
 
 For small tables, ETS always wins. Bigger tables HakiSQL is much faster and more consistent in timing.
 
+Look at [this perf test][3] for more info
+
 ### References
 The Lexer and Parser code were originally copied/modified from [swirl][2].
 
 
 [1]: https://github.com/gootik/hakicache
 [2]: https://github.com/lpgauth/swirl
+[3]: https://github.com/gootik/hakisql/blob/master/test/hakisql_perf_test.erl#L13

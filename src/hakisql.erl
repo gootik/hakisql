@@ -36,6 +36,6 @@ q(TableName, Query) ->
 
         {ok, Rows}
     catch
-        error:Reason:Stack ->
-            {error, Reason, Stack, []}
+        error:Reason ->
+            {error, Reason, []}
     end.

@@ -20,3 +20,6 @@ rebar3.crashdump
 
 src/query/hakisql_parser2.erl
 src/query/hakisql_lexer2.erl
+
+src/hakisql_parser2.erl
+src/hakisql_lexer2.erl

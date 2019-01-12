@@ -29,6 +29,7 @@ predicates -> predicate 'or' predicate : {'or', '$1', '$3'}.
 predicates -> predicates 'or' predicate : {'or', '$1', '$3'}.
 
 predicates -> predicate 'and' predicate : {'and', '$1', '$3'}.
+predicates -> predicates 'and' predicate : {'and', '$1', '$3'}.
 
 predicate -> var 'in' list : {'op', 'in', unwrap('$1'), '$3'}.
 predicate -> var 'not' 'in' list : {'op', 'notin', unwrap('$1'), '$4'}.

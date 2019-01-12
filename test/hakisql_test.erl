@@ -21,6 +21,83 @@ simple_eq_test() ->
 
     {ok, [#{a := test, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "b = 2").
 
+simple_eq_atom_test() ->
+    ok = hakisql:create(test, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [number],
+        name => [string]
+    }),
+
+    ok = hakisql:insert(test, [
+        #{a => test1, b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 24, c => 12.1, name => "B"},
+        #{a => test, b => 24, c => 12.1, name => "C"},
+        #{a => test2, b => 24, c => 12.1, name => "D"},
+        #{a => test, b => 24, c => 12.1, name => "E"},
+        #{a => test4, b => 24, c => 12.1, name => "F"}
+    ]),
+
+    {ok, [#{a := test1, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "a = test1").
+
+simple_eq_float_test() ->
+    ok = hakisql:create(test, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [index, number],
+        name => [string]
+    }),
+
+    ok = hakisql:insert(test, [
+        #{a => test1, b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 24, c => 12.1, name => "B"},
+        #{a => test, b => 24, c => 12.1, name => "C"},
+        #{a => test2, b => 24, c => 12.1, name => "D"},
+        #{a => test, b => 24, c => 12.1, name => "E"},
+        #{a => test4, b => 24, c => 12.1, name => "F"}
+    ]),
+
+    {ok, [#{a := test1, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "c = 3.1").
+
+simple_and_test() ->
+    ok = hakisql:create(test, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [index, number],
+        name => [string]
+    }),
+
+    ok = hakisql:insert(test, [
+        #{a => test1, b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 24, c => 12.1, name => "B"},
+        #{a => test, b => 24, c => 3.1, name => "C"},
+        #{a => test2, b => 2, c => 12.1, name => "D"},
+        #{a => test, b => 2, c => 12.1, name => "E"},
+        #{a => test4, b => 2, c => 12.1, name => "F"}
+    ]),
+
+    {ok, [#{a := test1, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "b = 2 AND c = 3.1").
+
+
+simple_or_test() ->
+    ok = hakisql:create(test, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [index, number],
+        name => [string]
+    }),
+
+    ok = hakisql:insert(test, [
+        #{a => test1, b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 24, c => 12.1, name => "B"},
+        #{a => test, b => 24, c => 12.1, name => "C"},
+        #{a => test2, b => 24, c => 12.1, name => "D"},
+        #{a => test, b => 24, c => 12.1, name => "E"},
+        #{a => test4, b => 24, c => 12.1, name => "F"}
+    ]),
+
+    {ok, [#{a := test1, b := 2, c := 3.1, name := "A"}]} = hakisql:q(test, "b = 8 OR c = 3.1").
+
 simple_not_test() ->
     ok = hakisql:create(test_not, #{
         a => [index, atom],

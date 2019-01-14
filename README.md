@@ -56,7 +56,7 @@ ok
 
 ### Benchmarks
 Using [eministat][4] to see if there is a significant
-difference between 1000 searches in 10000 "complex" records
+difference between [1000 searches in 10000 "complex" records][6]
 using hakisql (persistent term storage) or ETS:
 ```
 Dataset: x (ETS) N=1000 CI=95.0000
@@ -108,3 +108,4 @@ The Lexer and Parser code were originally copied/modified from [swirl][2].
 [3]: https://github.com/gootik/hakisql/blob/master/test/hakisql_perf_test.erl#L13
 [4]: https://github.com/jlouis/eministat
 [5]: http://erlang.org/doc/man/persistent_term.html
+[6]: https://github.com/gootik/hakisql/blob/master/benchmark/benchmark.erl

@@ -17,6 +17,7 @@
 create(TableName, ColumnDefinition) ->
     hakisql_table:create(TableName, ColumnDefinition).
 
+%% @doc Drop a table
 -spec drop(table_name()) -> ok.
 drop(TableName) ->
     hakisql_table:drop(TableName).
@@ -36,6 +37,6 @@ q(TableName, Query) ->
 
         {ok, Rows}
     catch
-        error:Reason ->
-            {error, Reason, []}
+        error:Reason:Stack ->
+            {error, Reason, Stack, []}
     end.

@@ -33,8 +33,11 @@ create(TableName, ColumnDefinition) ->
                        index_table => IndexTableName,
                        index_field_names => IndexFieldNames},
 
-    haki:cache(SchemaTableName, InternalSchema).
+    hakisql_storage:insert(SchemaTableName, InternalSchema).
 
+%% @doc Given a table name deletes all haki_* modules related to
+%%      the table and it's data.
+%% @end
 -spec drop(table_name()) -> ok.
 drop(TableName) ->
     SchemaTableName = internal_table_name(schema, TableName),
@@ -43,11 +46,8 @@ drop(TableName) ->
     lists:foreach(
         fun(I) ->
             Mod = list_to_atom("haki_" ++ atom_to_list(I)),
-
-            code:purge(Mod),
-            code:delete(Mod)
-        end, [SchemaTableName, IndexTableName, TableName]),
-    ok.
+            hakisql_storage:drop(Mod)
+        end, [SchemaTableName, IndexTableName, TableName]).
 
 
 %% @doc Will insert the rows in the given table and update index mappings.
@@ -62,19 +62,19 @@ insert(TableName, Rows) ->
             {RowMap#{'_id' => RowId}, {AccMap#{RowId => RowMap}, RowId + 1}}
         end, {#{}, InitialNumRows}, Rows),
 
-    haki:cache(internal_table_name(schema, TableName), Schema#{num_rows => NumRows}),
-    haki:cache_bucket(TableName, RowMap),
+    hakisql_storage:insert(internal_table_name(schema, TableName), Schema#{num_rows => NumRows}),
+    hakisql_storage:insert_map(TableName, RowMap),
 
     %% TODO(gootik): Need to UPDATE indexes not rebuild. Using only newly added rows.
     IndexMap = hakisql_index:calculate_index_map(Schema, EnrichedRows, NumRows),
 
-    haki:cache_bucket(maps:get(index_table, Schema), IndexMap).
+    hakisql_storage:insert_map(maps:get(index_table, Schema), IndexMap).
 
 %% @doc Will return the internal schema for the given table.
 %% @end
 -spec schema_for_table(table_name()) -> map() | error.
 schema_for_table(TableName) ->
-    case haki:get(internal_table_name(schema, TableName)) of
+    case hakisql_storage:get(internal_table_name(schema, TableName)) of
         bad_key -> error(no_table);
         Schema -> Schema
     end.
@@ -83,9 +83,14 @@ schema_for_table(TableName) ->
 %%      and return the result. The order of result is not guaranteed.
 %% @end
 -spec fetch_using_bitmap(table_name(), bitmap:bitmap()) -> [table_row()].
+-ifdef('HAS_PERSISTENT_TERM').
 fetch_using_bitmap(TableName, Bitmap) ->
-    TableMod = haki_compiler:mod_name(TableName),
-    traverse_bitmap(TableMod, Bitmap).
+    traverse_bitmap(TableName, Bitmap).
+-else.
+fetch_using_bitmap(TableName, Bitmap) ->
+    traverse_bitmap(haki_compiler:mod_name(TableName), Bitmap).
+-endif().
+
 
 internal_table_name(schema, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX);
 internal_table_name(index, TableName)  -> list_to_atom(atom_to_list(TableName) ++ ?INDEX_TABLE_POSTFIX).
@@ -107,5 +112,5 @@ traverse_bitmap(_, <<>>, _, Acc) ->
 traverse_bitmap(TableMod, <<0:1, Rest/bitstring>>, RowId, Acc) ->
     traverse_bitmap(TableMod, Rest, RowId + 1, Acc);
 traverse_bitmap(TableMod, <<1:1, Rest/bitstring>>, RowId, Acc) ->
-    R = TableMod:get(RowId),
+    R = hakisql_storage:map_get(TableMod, RowId),
     traverse_bitmap(TableMod, Rest, RowId + 1, [R | Acc]).

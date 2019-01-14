@@ -203,6 +203,31 @@ simple_string_test() ->
 
     {ok, [#{a := test2, b := 24, c := 12.1, name := "D"}]} = hakisql:q(test_string, "name = 'D'").
 
+or_and_test() ->
+    ok = hakisql:create(test_in, #{
+        a => [index, atom],
+        b => [index, number],
+        c => [index, number],
+        name => [string]
+    }),
+
+    ok = hakisql:insert(test_in, [
+        #{a => test1, b => 2, c => 3.1, name => "A"},
+        #{a => test2, b => 2, c => 4.1, name => "B"},
+        #{a => test, b => 24, c => 12.1, name => "C"},
+        #{a => test2, b => 24, c => 12.1, name => "D"},
+        #{a => test, b => 24, c => 12.1, name => "E"},
+        #{a => test4, b => 2, c => 12.1, name => "F"}
+    ]),
+
+    ExpectedResult = [#{a => test1, b => 2, c => 3.1, name => "A"},
+                      #{a => test4, b => 2, c => 12.1, name => "F"}],
+
+    {ok, Result} = hakisql:q(test_in, "(c = 3.1 OR c = 12.1) AND b = 2"),
+
+    ExpectedResult = Result.
+
+
 %range_test() ->
 %    hakisql:create(range_test, #{
 %        b => [index]

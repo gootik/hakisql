@@ -22,9 +22,9 @@ Does not exist. Restart the VM and your data is gone :)
 
 ### TODO
 1. Range query use range bitmap index
-2. Custom filtering funs?! like ets:fun2ms()
-3. Inserting rows need to recalculate index
-4. Create views
+2. Inserting rows need to recalculate index
+3. Persistence?
+4. More tests for queries
 
 ### Example
 ```erlang

@@ -57,7 +57,7 @@ Using [eministat][4] to see if there is a significant
 difference between 1000 searches in 10000 "complex" records
 using hakisql (persistent term storage) or ETS:
 ```
-Dataset: x N=1000 CI=95.0000
+Dataset: x (ETS) N=1000 CI=95.0000
 Statistic     Value     [         Bias] (Bootstrapped LB‥UB)
 Min:            783.000
 1st Qu.         826.000
@@ -72,7 +72,7 @@ Outliers: 0/103 = 103 (μ=910.422, σ=190.014)
 
 ------
 
-Dataset: + N=1000 CI=95.0000
+Dataset: + (HakiSQL) N=1000 CI=95.0000
 Statistic     Value     [         Bias] (Bootstrapped LB‥UB)
 Min:            152.000
 1st Qu.         153.000

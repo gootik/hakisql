@@ -77,7 +77,7 @@ query_to_bitmap(_, _, _) ->
     error(not_implemented).
 
 field_value_bitmap(IndexTable, Field, Value, Default) ->
-    case haki:get(IndexTable, Field) of
+    case hakisql_storage:map_get(IndexTable, Field) of
         bad_key -> Default;
         FieldMap -> maps:get(Value, FieldMap, Default)
     end.

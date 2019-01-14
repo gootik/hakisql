@@ -74,4 +74,3 @@ simple_ets_test() ->
 
     ets:delete(test_table),
     hakisql:drop(test).
-

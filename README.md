@@ -1,7 +1,9 @@
 # HakiSQL
 
 An in-memory datastore for Erlang that uses [hakicache][1] in the background. This
-allows for querying the data with no copy.
+allows for querying the data with no copy. 
+**NOTE**: On OTP 21+, hakicache is not used and instead data is stoed in [persistent term][5] 
+storage built into Erlang.
 
 HakiSQL allows for very basic SQL-like queries.
 
@@ -105,3 +107,4 @@ The Lexer and Parser code were originally copied/modified from [swirl][2].
 [2]: https://github.com/lpgauth/swirl
 [3]: https://github.com/gootik/hakisql/blob/master/test/hakisql_perf_test.erl#L13
 [4]: https://github.com/jlouis/eministat
+[5]: http://erlang.org/doc/man/persistent_term.html

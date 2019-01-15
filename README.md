@@ -54,6 +54,51 @@ ok
  #{a => test,b => 8,c => 12.1,name => "E"}]
 ```
 
+### Query Language
+The language is a basic version of popular SQL:
+
+### Operations
+#### And
+`expresion AND expression`
+Return rows where both expressions are true.
+
+#### Or
+`expression Or expression`
+Return rows where either expression is true.
+
+### =
+`field = values`
+Return rows where field value is equal to value.
+
+### !=
+`field = values`
+Return rows where field value is not equal to value.
+
+### > / < / <= / =>
+`field (>/</<=/=>) values`
+Return rows where field equality is tested against value.
+Comparison follows [Erlang standard](http://erlang.org/doc/reference_manual/expressions.html#term-comparisons).
+
+#### In
+`field in (values)`
+Return rows where field value is one of values.
+
+#### Not
+`field not in (values)`
+Return rows where expression value is not any of values.
+
+### Value Representation
+#### Atoms
+`"field = atom"`
+#### String
+`"field = 'string'"`
+#### Number
+`"field = 23 OR field = 2.3"`
+#### Binary
+`"field = <<'binary'>>"`
+### Tuple
+`"field = {a,b,23}"`
+
 ### Benchmarks
 Using [eministat][4] to see if there is a significant
 difference between [1000 searches in 10000 "complex" records][6]

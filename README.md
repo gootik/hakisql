@@ -1,4 +1,4 @@
-# HakiSQL
+# HakiSQL [![Build Status](https://travis-ci.org/gootik/hakisql.svg?branch=master)](https://travis-ci.org/gootik/hakisql)
 
 An in-memory datastore for Erlang that uses [hakicache][1] in the background. This
 allows for querying the data with no copy. 

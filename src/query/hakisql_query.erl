@@ -76,8 +76,16 @@ query_to_bitmap(#{index_table := IndexTable} = _Schema, {'op', 'notin', Field, {
 query_to_bitmap(_, _, _) ->
     error(not_implemented).
 
+-ifdef('HAS_PERSISTENT_TERM').
 field_value_bitmap(IndexTable, Field, Value, Default) ->
     case hakisql_storage:map_get(IndexTable, Field) of
         bad_key -> Default;
         FieldMap -> maps:get(Value, FieldMap, Default)
     end.
+-else.
+field_value_bitmap(IndexTable, Field, Value, Default) ->
+    case hakisql_storage:map_get(haki_compiler:mod_name(IndexTable), Field) of
+        bad_key -> Default;
+        FieldMap -> maps:get(Value, FieldMap, Default)
+    end.
+-endif.

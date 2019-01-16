@@ -10,42 +10,39 @@
     drop/1
 ]).
 -ifdef('HAS_PERSISTENT_TERM').
-    insert(Key, Value) ->
-        persistent_term:put(Key, Value).
+insert(Key, Value) ->
+    persistent_term:put(Key, Value).
 
-    insert_map(Table, Values) ->
-        List = maps:to_list(Values),
+insert_map(Table, Values) ->
+    List = maps:to_list(Values),
 
-        lists:foreach(
-            fun({K, V}) ->
-                persistent_term:put({Table, K}, V)
-            end, List).
+    lists:foreach(
+        fun({K, V}) ->
+            persistent_term:put({Table, K}, V)
+        end, List).
 
-    get(Key) ->
-        persistent_term:get(Key).
+get(Key) ->
+    persistent_term:get(Key).
 
-    map_get(Table, Key) ->
-        persistent_term:get({Table, Key}).
+map_get(Table, Key) ->
+    persistent_term:get({Table, Key}).
 
-    drop(Key) ->
-        persistent_term:erase(Key).
-
+drop(Key) ->
+    persistent_term:erase(Key).
 -else.
+insert(Key, Value) ->
+    haki:cache(Key, Value).
 
-    insert(Key, Value) ->
-        haki:cache(Key, Value).
+insert_map(Table, Values) ->
+    haki:cache_bucket(Table, Values).
 
-    insert_map(Table, Values) ->
-        haki:cache_bucket(Table, Values).
+get(Key) ->
+    haki:get(Key).
 
-    get(Key) ->
-        haki:get(Key).
+map_get(Table, Key) ->
+    Table:get(Key).
 
-    map_get(Table, Key) ->
-        Table:get(Key).
-
-
-    drop(Key) ->
-        code:purge(Key),
-        code:delete(Key).
+drop(Key) ->
+    code:purge(Key),
+    code:delete(Key).
 -endif.

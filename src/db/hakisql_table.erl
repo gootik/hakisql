@@ -89,7 +89,7 @@ fetch_using_bitmap(TableName, Bitmap) ->
 -else.
 fetch_using_bitmap(TableName, Bitmap) ->
     traverse_bitmap(haki_compiler:mod_name(TableName), Bitmap).
--endif().
+-endif.
 
 
 internal_table_name(schema, TableName) -> list_to_atom(atom_to_list(TableName) ++ ?SCHEMA_TABLE_POSTFIX);

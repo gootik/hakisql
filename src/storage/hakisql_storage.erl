@@ -48,4 +48,4 @@
     drop(Key) ->
         code:purge(Key),
         code:delete(Key).
--endif().
+-endif.

@@ -1,8 +1,9 @@
 # HakiSQL [![Build Status](https://travis-ci.org/gootik/hakisql.svg?branch=master)](https://travis-ci.org/gootik/hakisql)
 
 An in-memory datastore for Erlang that uses [hakicache][1] in the background. This
-allows for querying the data with no copy.
-**NOTE**: On OTP 21+, hakicache is not used and instead data is stoed in [persistent term][5]
+allows for querying the data with no copy. 
+
+**NOTE**: On OTP 21+, hakicache is not used and instead data is stoed in [persistent term][5] 
 storage built into Erlang.
 
 HakiSQL allows for very basic SQL-like queries.
@@ -18,7 +19,7 @@ using it. Especially if you load/insert data often.
 To learn about Bitmap indexes and fast datastore access path problems.
 
 ### Persistence
-Does not exist. Restart the VM and your data is gone :)
+:warning: Does not exist. Restart the VM and your data is gone :)
 
 ### TODO
 1. Range query use range bitmap index
@@ -53,6 +54,59 @@ ok
 [#{a => test,b => 2,c => 3.1,name => "A"},
  #{a => test,b => 8,c => 12.1,name => "E"}]
 ```
+
+### Query Language
+The language is a basic version of popular SQL:
+
+### Operations
+#### And
+`expresion AND expression`
+Return rows where both expressions are true.
+
+#### Or
+`expression OR expression`
+Return rows where either expression is true.
+
+### =
+`field = values`
+Return rows where field value is equal to value.
+
+### !=
+`field = values`
+Return rows where field value is not equal to value.
+
+### > / < / <= / =>
+:warning: Not Implemented.
+
+`field (>/</<=/=>) values`
+Return rows where field equality is tested against value.
+Comparison follows [Erlang standard](http://erlang.org/doc/reference_manual/expressions.html#term-comparisons).
+
+#### In
+`field in (values)`
+Return rows where field value is one of values.
+
+#### Not
+`field not in (values)`
+Return rows where expression value is not any of values.
+
+### Value Representation
+#### Atoms
+`"field = atom"`
+#### String
+`"field = 'string'"`
+#### Number
+`"field = 23 OR field = 2.3"`
+#### Binary
+`"field = <<'binary'>>"`
+#### Tuple
+:warning: Has bugs.
+
+`"field = {a,b,23}"`
+#### Map
+:warning: Not implemented.
+#### Record
+:warning: Not implemented.
 
 ### Benchmarks
 Using [eministat][4] to see if there is a significant
